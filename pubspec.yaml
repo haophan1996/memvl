@@ -1,0 +1,62 @@
+name: mem_vl
+description: Believe it or not This application will make people laugh out loud. Feeling sad, no worries, this app will make you happy whenver you open it
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  keyboard_dismisser: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_native_splash: ^1.1.8+4
+  get: ^4.1.4
+  firebase_auth: ^1.1.2
+  firebase_database: ^6.1.2
+
+
+flutter_native_splash:
+   color: "#ffffff"
+   image: "assets/splash.png"
+   color_dark: "#000000"
+   image_dark: "assets/splash.png"
+   android: true
+   ios: true
+  #restart splash screen by : flutter pub pub run flutter_native_splash:create
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - login_banner.png
+    - ic_email.png
+    - ic_password.png
+    - ic_phone.png
+    - ic_name.png
+    - ic_pass_on.png
+    - ic_pass_off.png
+    - signup_banner.png
