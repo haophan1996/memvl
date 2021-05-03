@@ -33,36 +33,28 @@ class LoginUI extends GetView<LoginController> {
                   ),
                   Text("Login",
                       style: TextStyle(fontSize: 16, color: Color(0xff606470))),
-                  UI_Helper().getTextField(controller.controller_email, 0, 50,
-                      0, 10, "Email", "ic_email.png", false),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                    child: Obx(
-                      () => TextField(
-                        textInputAction: TextInputAction.next,
-                        controller: controller.controller_pass,
-                        style: TextStyle(fontSize: 18, color: Colors.black),
-                        obscureText: controller.isHidden.value,
-                        decoration: InputDecoration(
-                          suffix: InkWell(
-                            onTap: () => {
-                              controller.togglePassword(),
-                            },
-                            child: controller.isHidden.value
-                                ? Image.asset("ic_pass_off.png")
-                                : Image.asset("ic_pass_on.png"),
-                          ),
-                          labelText: 'Password',
-                          prefixIcon: Container(
-                              width: 20, child: Image.asset('ic_password.png')),
-                          border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Color(0xffCED0D2), width: 1),
-                            borderRadius: BorderRadius.all(Radius.circular(6)),
-                          ),
-                        ),
-                      ),
-                    ),
+                  Obx(() => UI_Helper().createTextField(
+                      controller.controller_email,
+                      0,
+                      50,
+                      0,
+                      10,
+                      "Email",
+                      "ic_email.png",
+                      controller.isEmailValid.value)),
+                  Obx(
+                    () => UI_Helper().createTextFieldPassword(
+                        controller.controller_pass,
+                        0,
+                        0,
+                        0,
+                        20,
+                        "Password",
+                        "ic_password.png",
+                        controller.isHidden.value,
+                        controller.isPasswordValid.value, () {
+                      controller.togglePassword();
+                    }),
                   ),
                   Container(
                     constraints:
@@ -85,7 +77,9 @@ class LoginUI extends GetView<LoginController> {
                       width: double.infinity,
                       height: 52,
                       child: RaisedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (controller.isValid() == true) {}
+                        },
                         child: Text("Log In",
                             style:
                                 TextStyle(fontSize: 18, color: Colors.white)),
