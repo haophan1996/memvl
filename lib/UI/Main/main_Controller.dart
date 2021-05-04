@@ -6,6 +6,6 @@ class MainController extends GetxController{
 
   String txt() {
     fireBaseAuthentication.getData();
-    return "asc";
+    return fireBaseAuthentication.name.value;
   }
 }

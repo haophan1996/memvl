@@ -8,4 +8,6 @@ class UserModel{
   const UserModel(
       this.email, this.name, this.phone );
 
+
+
 }

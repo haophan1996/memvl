@@ -8,6 +8,7 @@ class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   RxString name = " ".obs;
+  List<UserModel> userInfor = [];
 
   void getData(){
     final User user = _firebaseAuth.currentUser;
@@ -15,24 +16,12 @@ class FireBaseAuthentication extends GetxController {
 
     final dbRef = FirebaseDatabase.instance.reference().child("users").child(uid);
     dbRef.once().then((result) {
-      name = result.value['name'].toString().obs;
-        print(result.value['name']);
+       name = result.value['name'].toString().obs;
+       print(name);
     });
 
 
     print(uid);
-  }
-
-  void signUp(String email, String password, String name, String phone,
-      Function onSuccess, Function(String) onRegisterError) {
-    _firebaseAuth
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .then((user) {
-
-      _createUser(user.user.uid, name, phone, onSuccess, onRegisterError);
-    }).catchError((err) {
-      _onSignUpError(err.code, onRegisterError);
-    });
   }
 
   void signIn(String email, String password, Function onSuccess,
@@ -45,6 +34,18 @@ class FireBaseAuthentication extends GetxController {
     }).catchError((err) {
       print("Message: ${err.toString()}");
       onSignInError(err.code);
+    });
+  }
+
+  void signUp(String email, String password, String name, String phone,
+      Function onSuccess, Function(String) onRegisterError) {
+    _firebaseAuth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((user) {
+
+      _createUser(user.user.uid, name, phone, onSuccess, onRegisterError);
+    }).catchError((err) {
+      _onSignUpError(err.code, onRegisterError);
     });
   }
 
