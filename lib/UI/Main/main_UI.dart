@@ -10,7 +10,7 @@ class MainUI extends GetView<MainController>{
           constraints: BoxConstraints.expand(),
           color: Colors.white,
           child: Center(
-            child: Text("Success"),
+            child: Obx(() => Text(controller.fireBaseAuthentication.name.toString()),),
           ),
         ),
      );

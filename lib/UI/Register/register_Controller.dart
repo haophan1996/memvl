@@ -4,7 +4,7 @@ import 'package:mem_vl/Firebase/firebaseAuth.dart';
 
 class RegisterController extends GetxController {
   static RegisterController get instance => Get.find<RegisterController>();
-  FireBaseAuthentication fireBaseAuthentication = new FireBaseAuthentication();
+  final FireBaseAuthentication fireBaseAuthentication = Get.find();
   RxBool isHidden = true.obs;
   RxBool isEmailValid = false.obs;
   RxBool isPasswordValid = false.obs;
@@ -40,6 +40,7 @@ class RegisterController extends GetxController {
   }
 
   bool isValid() {
+
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);

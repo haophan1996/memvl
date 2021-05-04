@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:mem_vl/UI/Main/main_Binding.dart';
+import 'package:mem_vl/UI/Main/main_UI.dart';
 import 'package:mem_vl/UI/Register/register_Binding.dart';
 import 'package:mem_vl/UI/Register/register_UI.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
+import 'package:mem_vl/Util/UI_Loading.dart';
 import 'login_Controller.dart';
 
 class LoginUI extends GetView<LoginController> {
@@ -78,7 +83,14 @@ class LoginUI extends GetView<LoginController> {
                       height: 52,
                       child: RaisedButton(
                         onPressed: () {
-                          if (controller.isValid() == true) {}
+                          if (controller.isValid() == true) {
+                            Get.defaultDialog(
+                              content: CircularProgressIndicator(),
+                              barrierDismissible: false,
+                              title: "Status",
+                            );
+                            controller.signIn();
+                          }
                         },
                         child: Text("Log In",
                             style:

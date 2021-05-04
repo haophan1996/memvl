@@ -1,17 +1,50 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:get/get.dart';
+import 'package:mem_vl/Models/user.dart';
 
-class FireBaseAuthentication {
+
+class FireBaseAuthentication extends GetxController {
+  static FireBaseAuthentication get i => Get.find();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  RxString name = " ".obs;
+
+  void getData(){
+    final User user = _firebaseAuth.currentUser;
+    final uid = user.uid;
+
+    final dbRef = FirebaseDatabase.instance.reference().child("users").child(uid);
+    dbRef.once().then((result) {
+      name = result.value['name'].toString().obs;
+        print(result.value['name']);
+    });
+
+
+    print(uid);
+  }
 
   void signUp(String email, String password, String name, String phone,
       Function onSuccess, Function(String) onRegisterError) {
     _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((user) {
+
       _createUser(user.user.uid, name, phone, onSuccess, onRegisterError);
     }).catchError((err) {
       _onSignUpError(err.code, onRegisterError);
+    });
+  }
+
+  void signIn(String email, String password, Function onSuccess,
+      Function(String) onSignInError) {
+    _firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((user) {
+      print("Message: signin success");
+      onSuccess();
+    }).catchError((err) {
+      print("Message: ${err.toString()}");
+      onSignInError(err.code);
     });
   }
 
@@ -31,13 +64,12 @@ class FireBaseAuthentication {
   }
 
   _onSignUpError(String code, Function(String) onRegisterError) {
-    print(code);
+    print("Message: ${code}");
     switch (code) {
-      case "ERROR_INVALID_EMAIL":
-      case "email-already-in-use":
-        onRegisterError("Invalid Email, please Check again");
+      case "unknown":
+        onRegisterError("Cannot connect to sever. Please try again later");
         break;
-      case "ERROR_EMAIL_ALREADY_IN_USE":
+      case "email-already-in-use":
         onRegisterError("Email Already IN Use, please use another");
         break;
       case "weak-password":
