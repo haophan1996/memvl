@@ -6,17 +6,14 @@ import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: Container(
-          constraints: BoxConstraints.expand(),
-          color: Colors.white,
-          child: Center(
-            child: Text("Homepage UI"),
-          ),
+    return Scaffold(
+      body: Container(
+        constraints: BoxConstraints.expand(),
+        color: Colors.white,
+        child: Center(
+          child:  Text("Profile UI"),
         ),
-      );
-    }
+      ),
+    );
   }
 }
