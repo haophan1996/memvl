@@ -38,6 +38,8 @@ dev_dependencies:
   firebase_auth: ^1.1.2
   firebase_database: ^6.1.2
   firebase_core: ^1.1.0
+  image_picker: ^0.7.4
+  firebase_storage: ^8.0.5
 
 flutter_native_splash:
    color: "#ffffff"
@@ -60,3 +62,5 @@ flutter:
     - ic_pass_on.png
     - ic_pass_off.png
     - signup_banner.png
+    - ic_image_upload.png
+    - profile_unknown.png

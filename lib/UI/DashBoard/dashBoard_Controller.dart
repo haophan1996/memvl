@@ -6,7 +6,7 @@ import 'package:mem_vl/UI/Pages/Profile/Profile_UI.dart';
 
 class DashBoardController extends GetxController{
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
-   final selectedIndex = 0.obs;
+  final selectedIndex = 0.obs;
 
   List<Widget> widgetOption = <Widget> [
     HomePageUI(),
