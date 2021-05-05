@@ -8,16 +8,19 @@ class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   RxString name = " ".obs;
-  List<UserModel> userInfor = [];
+  RxString phone = " ".obs;
+  RxString email = " ".obs;
+  List<UserModel> userInformation = [];
 
   void getData(){
     final User user = _firebaseAuth.currentUser;
     final uid = user.uid;
 
     final dbRef = FirebaseDatabase.instance.reference().child("users").child(uid);
-    dbRef.once().then((result) {
-       name = result.value['name'].toString().obs;
-       print(name);
+    dbRef.once().then((DataSnapshot result) {
+      name = (result.value['name']).toString().obs ;
+      phone = (result.value['phone']).toString().obs ;
+      email = (user.email).obs ;
     });
 
 

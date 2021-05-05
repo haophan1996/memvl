@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
-import 'package:mem_vl/UI/Main/main_Binding.dart';
-import 'package:mem_vl/UI/Main/main_UI.dart';
+import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
+import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find<LoginController>();
@@ -28,7 +28,7 @@ class LoginController extends GetxController {
         () {
       //On success
       Get.back();
-      Get.off(MainUI(), binding: MainBinding());
+      Get.off(DashBoardUI(), binding: DashBoardBing());
     }, (msg) {
       //On fail
       Timer(Duration(seconds: 1), () {
