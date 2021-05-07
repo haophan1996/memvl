@@ -8,21 +8,21 @@ class FireBaseUploadImage extends GetxController {
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
   File image;
   final picker = ImagePicker();
-  var process = 0.obs;
+  var pathImage = "".obs;
 
   Future getImage(Function prepare) async {
     final pickerFile = await picker.getImage(source: ImageSource.gallery);
     if (pickerFile != null) {
-      prepare();
       image = File(pickerFile.path);
+      pathImage.value = image.path;
+      prepare();
     } else{
-      print(image.path);
       print("No file selected");
     }
-    update();
   }
 
   uploadImage(Function onSuccess) async {
+    print("uploadImage:  ${image}");
     var firebaseStorage = FirebaseStorage.instance
         .ref()
         .child("ProfileUser/${fireBaseAuthentication.user.uid}/${getFileName(image.path)}");

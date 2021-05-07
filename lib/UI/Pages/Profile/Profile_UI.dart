@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,8 +18,12 @@ class ProfileUI extends GetView<ProfileController> {
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              CircleAvatar(
-                backgroundImage: AssetImage("asssets/profile_unknown.png"),
+              Obx(
+                    () => CircleAvatar(
+                  // ignore: unrelated_type_equality_checks
+                    backgroundImage: controller.fireBaseUploadImage.pathImage == '' ? AssetImage("assets/profile_unknown.png") :
+                    Image.file(File(controller.fireBaseUploadImage.pathImage.value)).image
+                ),
               ),
               Positioned(
                 right: -12,
@@ -44,27 +49,26 @@ class ProfileUI extends GetView<ProfileController> {
         ),
         Padding(
           padding: EdgeInsets.only(top: 20),
-          child: Obx(() =>Text(
-            controller.fireBaseAuthentication.name.value,
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
+          child: Obx(
+                () => Text(
+              controller.fireBaseAuthentication.name.value,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          ),
         ),
-
-
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: EdgeInsets.fromLTRB(50, 50, 0, 0),
-            child: Obx(()=> Text(
-              controller.fireBaseUploadImage.process.value.toString(),
+            child:  Text(
+              "Dont know",
               style: TextStyle(
                 fontSize: 20,
               ),
-            ),)
+            ),
           ),
         ),
         Align(
