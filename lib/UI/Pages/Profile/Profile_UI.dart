@@ -18,7 +18,7 @@ class ProfileUI extends GetView<ProfileController> {
             fit: StackFit.expand,
             children: <Widget>[
               CircleAvatar(
-                backgroundImage: AssetImage("assets/profile_unknown.png"),
+                backgroundImage: AssetImage("asssets/profile_unknown.png"),
               ),
               Positioned(
                 right: -12,
