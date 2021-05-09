@@ -13,8 +13,4 @@ class DashBoardController extends GetxController{
     ProfileUI(),
   ];
 
-  String txt() {
-    fireBaseAuthentication.getData();
-    return "ascsd";
-  }
 }

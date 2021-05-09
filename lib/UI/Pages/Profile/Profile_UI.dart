@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
@@ -19,10 +19,10 @@ class ProfileUI extends GetView<ProfileController> {
             fit: StackFit.expand,
             children: <Widget>[
               Obx(
-                    () => CircleAvatar(
-                  // ignore: unrelated_type_equality_checks
-                    backgroundImage: controller.fireBaseUploadImage.pathImage == '' ? AssetImage("assets/profile_unknown.png") :
-                    Image.file(File(controller.fireBaseUploadImage.pathImage.value)).image
+                    () => CircleAvatar( 
+                    backgroundImage: controller.fireBaseAuthentication.photoUrl.value == '' ? AssetImage("assets/profile_unknown.png") :
+                      controller.fireBaseAuthentication.photoLink.toString().length<5 ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value)).image :
+                      CachedNetworkImageProvider(controller.fireBaseAuthentication.photoLink),
                 ),
               ),
               Positioned(
@@ -37,8 +37,9 @@ class ProfileUI extends GetView<ProfileController> {
                         borderRadius: BorderRadius.circular(60),
                         side: BorderSide(color: Colors.black)),
                     color: Color(0xFFF5F6F9),
-                    onPressed: () {
-                      controller.getUploadImage();
+                    onPressed: () async {
+                       controller.getUploadImage();
+                      print(controller.fireBaseAuthentication.photoLink);
                     },
                     child: Image.asset("ic_image_upload.png"),
                   ),

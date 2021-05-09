@@ -3,8 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SetDialog {
+  setDialogMessage(String content, bool isTwoGetBack) {
+    Get.back();
+    Get.defaultDialog(
+      title: "Status",
+      content: Text(content),
+      textConfirm: "Ok",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.green,
+      onConfirm: () {
+        Get.back();
+        if (isTwoGetBack) Get.back();
+      },
+    );
+  }
 
-   showLoading(BuildContext context, String msg) {
+  setLoading() {
+    Get.defaultDialog(
+        content: CircularProgressIndicator(),
+        barrierDismissible: false,
+        title: "Loading...");
+  }
+
+  showLoading(BuildContext context, String msg) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -27,36 +48,35 @@ class SetDialog {
     );
   }
 
-   createAlertDialog(BuildContext context, String title, String content,
-       bool isSuccess, String message) {
-     // set up the button
-     Widget okButton = FlatButton(
-       child: Text("OK"),
-       onPressed: () {
-         if (isSuccess) {
-           Get.back();
-           Get.back();
-         } else {
-           Get.back();
-         }
-       },
-     );
-     // set up the AlertDialog
-     AlertDialog alert = AlertDialog(
-       title: Text("Meme VL "),
-       content: Text(message),
-       actions: [
-         okButton,
-       ],
-     );
+  createAlertDialog(BuildContext context, String title, String content,
+      bool isSuccess, String message) {
+    // set up the button
+    Widget okButton = FlatButton(
+      child: Text("OK"),
+      onPressed: () {
+        if (isSuccess) {
+          Get.back();
+          Get.back();
+        } else {
+          Get.back();
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Meme VL "),
+      content: Text(message),
+      actions: [
+        okButton,
+      ],
+    );
 
-     // show the dialog
-     showDialog(
-       context: context,
-       builder: (BuildContext context) {
-         return alert;
-       },
-     );
-   }
-
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 }

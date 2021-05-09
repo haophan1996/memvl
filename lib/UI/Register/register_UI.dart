@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,42 @@ class RegisterUI extends GetView<RegisterController> {
             child: Column(
               children: <Widget>[
                 SizedBox(height: 10),
-                Image.asset('signup_banner.png', width: 300, height: 150),
+                SizedBox(
+                  height: 115,
+                  width: 115,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      Obx(
+                        () => CircleAvatar(
+                            // ignore: unrelated_type_equality_checks
+                            backgroundImage: controller.imagePath == ''
+                                ? AssetImage("assets/signup_banner.png")
+                                : Image.file(File(controller.imagePath.value))
+                                    .image),
+                      ),
+                      Positioned(
+                        right: -12,
+                        bottom: 0,
+                        child: SizedBox(
+                          height: 46,
+                          width: 46,
+                          child: FlatButton(
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(60),
+                                side: BorderSide(color: Colors.black)),
+                            color: Color(0xFFF5F6F9),
+                            onPressed: () {
+                              controller.getImagePicker();
+                            },
+                            child: Image.asset("ic_image_upload.png"),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 40, 6, 6),
                   child: Text('Wassup New Mem',
@@ -95,20 +131,9 @@ class RegisterUI extends GetView<RegisterController> {
                   width: double.infinity,
                   height: 52,
                   child: RaisedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (controller.isValid() == true) {
-                        SetDialog().showLoading(context, "Loading");
-                        controller.signup();
-                        Timer(Duration(seconds: 1), () {
-                          Navigator.pop(context);
-                          print(controller.isSignupSuccess);
-                          SetDialog().createAlertDialog(
-                              context,
-                              "Signup status",
-                              "Success",
-                              controller.isSignupSuccess,
-                              controller.message);
-                        });
+                         controller.signup();
                       }
                     },
                     child: Text('Signup',

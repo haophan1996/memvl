@@ -1,32 +1,29 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
-import 'package:mem_vl/Models/user.dart';
 
 class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  RxString name = " ".obs;
-  RxString phone = " ".obs;
-  RxString email = " ".obs;
-  List<UserModel> userInformation = [];
-  User user;
+  RxString name = "".obs;
+  RxString phone = "".obs;
+  RxString email = "".obs;
+  RxString photoUrl = "".obs;
+  var photoLink;
+  User userCurrent;
 
-  void getData() {
-    user = _firebaseAuth.currentUser;
-    final uid = user.uid;
-
+  void setData() {
+    userCurrent = _firebaseAuth.currentUser;
     final dbRef =
-        FirebaseDatabase.instance.reference().child("users").child(uid);
-    dbRef.once().then((DataSnapshot result) {
+        FirebaseDatabase.instance.reference().child("users").child(userCurrent.uid);
+    dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
       phone = (result.value['phone']).toString().obs;
-      email = (user.email).obs;
-
-      print(name);
+      email = (userCurrent.email).obs;
+      photoUrl = (userCurrent.photoURL).obs;
+      photoLink = await FirebaseStorage.instance.ref(photoUrl.value.toString()).getDownloadURL();
     });
-
-    print(uid);
   }
 
   Future<void> signIn(String email, String password, Function onSuccess,
@@ -34,11 +31,9 @@ class FireBaseAuthentication extends GetxController {
     await _firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password)
         .then((user) {
-      print("Message: signin success");
-      getData();
+      setData();
       onSuccess();
     }).catchError((err) {
-      print("Message: ${err.toString()}");
       onSignInError(err.code);
     });
   }
@@ -48,6 +43,7 @@ class FireBaseAuthentication extends GetxController {
     await _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((user) {
+      userCurrent = user.user;
       _createUser(user.user.uid, name, phone, onSuccess, onRegisterError);
     }).catchError((err) {
       _onSignUpError(err.code, onRegisterError);
@@ -62,7 +58,6 @@ class FireBaseAuthentication extends GetxController {
     };
     var ref = FirebaseDatabase.instance.reference().child("users");
     ref.child(userId).set(user).then((user) {
-      //This will go to next page
       onSuccess();
     }).catchError((err) {
       onRegisterError("SignUp fail, please try again later");
@@ -70,7 +65,7 @@ class FireBaseAuthentication extends GetxController {
   }
 
   _onSignUpError(String code, Function(String) onRegisterError) {
-    print("Message: ${code}");
+    print("Message: $code");
     switch (code) {
       case "unknown":
         onRegisterError("Cannot connect to sever. Please try again later");

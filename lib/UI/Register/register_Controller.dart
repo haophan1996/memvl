@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
+import '../../Firebase/firebaseUploadImage.dart';
+import '../../Util/UI_Loading.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterController extends GetxController {
   static RegisterController get instance => Get.find<RegisterController>();
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
+  final FireBaseUploadImage fireBaseUploadImage = Get.find();
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   RxBool isHidden = true.obs;
   RxBool isEmailValid = false.obs;
   RxBool isPasswordValid = false.obs;
@@ -12,6 +17,7 @@ class RegisterController extends GetxController {
   RxBool isPhoneValid = false.obs;
   bool isSignupSuccess = false;
   String message;
+  var imagePath = "".obs;
 
   final myController_email = TextEditingController();
   final myController_pass = TextEditingController();
@@ -20,27 +26,54 @@ class RegisterController extends GetxController {
 
   void togglePassword() {
     isHidden.value = isHidden.value ? false : true;
-    print(isHidden);
-    print(isValid());
+  }
+
+  void getImagePicker() {
+    fireBaseUploadImage.getImage((value) {
+      if (value.length > 2) {
+        imagePath.value = value;
+      }
+    });
+  }
+
+  void uploadImage() {
+    fireBaseUploadImage.uploadImage(imagePath.value, (path) async {
+      //onSuccess
+      _firebaseAuth.currentUser
+          .updateProfile(photoURL: path)
+          .then((value) async {
+        fireBaseAuthentication.userCurrent.reload();
+        print(fireBaseAuthentication.userCurrent.photoURL);
+        SetDialog().setDialogMessage("Thank you for singning up",true);
+        print("signup success");
+      }).catchError((onError) {
+        SetDialog().setDialogMessage(onError.toString(),false);
+      });
+    });
   }
 
   void signup() {
+    SetDialog().setLoading();
     fireBaseAuthentication.signUp(
         myController_email.text,
         myController_pass.text,
         myController_name.text,
-        myController_phone.text, () {
-      //If success
-      isSignupSuccess = true;
-      message = "Thank you for singning up";
+        myController_phone.text, ()  {
+      //If success, then update image
+      if (imagePath.value.length > 2) {
+        uploadImage();
+      } else {
+        SetDialog().setDialogMessage("Thank you for singning up",true);
+        Get.back();
+      }
     }, (msg) {
-      message = msg.toString();
+          // If fail, then print error to user
+      SetDialog().setDialogMessage(msg.toString(),false);
       print(msg.toString());
     });
   }
 
   bool isValid() {
-
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
