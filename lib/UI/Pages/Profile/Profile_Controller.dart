@@ -20,9 +20,12 @@ class ProfileController extends GetxController {
         imagePath.value = value;
         fireBaseUploadImage.uploadImage(imagePath.value, (path) async {
           //onSuccess
-          FirebaseStorage.instance.ref(_firebaseAuth.currentUser.photoURL).delete().then((value){
-            print("deleted success");
-          });
+          if (_firebaseAuth.currentUser.photoURL != null){
+            FirebaseStorage.instance.ref(_firebaseAuth.currentUser.photoURL).delete().then((value){
+              print("deleted success");
+            });
+          }
+
           _firebaseAuth.currentUser
               .updateProfile(photoURL: path)
               .then((value) async {

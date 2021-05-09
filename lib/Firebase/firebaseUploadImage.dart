@@ -24,7 +24,7 @@ class FireBaseUploadImage extends GetxController {
     print("uploadImage:  $imagePath");
     var firebaseStorage = FirebaseStorage.instance
         .ref()
-        .child("ProfileUser/${fireBaseAuthentication.userCurrent.uid}/${getFileName(imagePath)}");
+        .child("ProfileUser/${fireBaseAuthentication.userCurrent.email.replaceAll('@', '_')}/${getFileName(imagePath)}");
     var task = firebaseStorage.putFile(File(imagePath));
     await task.then((value) {
       //Success

@@ -63,8 +63,8 @@ class RegisterController extends GetxController {
       if (imagePath.value.length > 2) {
         uploadImage();
       } else {
+        print("here");
         SetDialog().setDialogMessage("Thank you for singning up",true);
-        Get.back();
       }
     }, (msg) {
           // If fail, then print error to user

@@ -1,11 +1,13 @@
 import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
+
+import '../../Util/UI_Loading.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find<LoginController>();
@@ -18,9 +20,26 @@ class LoginController extends GetxController {
   final controller_email = TextEditingController();
   final controller_pass = TextEditingController();
 
+  @override
+  void onInit(){
+    super.onInit();
+    print("check");
+  }
+
+  @override
+  Future<void> onReady() {
+    super.onReady();
+    if (FirebaseAuth.instance.currentUser !=null) signInUser();
+  }
+
+
   void togglePassword() {
     isHidden.value = isHidden.value ? false : true;
     print(isHidden);
+  }
+
+  void signInUser(){
+    Get.off(DashBoardUI(), binding: DashBoardBing());
   }
 
   void signIn() {
@@ -28,12 +47,10 @@ class LoginController extends GetxController {
         () {
       //On success
       Get.back();
-      Get.off(DashBoardUI(), binding: DashBoardBing());
+      signInUser();
     }, (msg) {
       //On fail
-      Timer(Duration(seconds: 1), () {
-        Get.back();
-      });
+       SetDialog().setDialogMessage(msg , false);
     });
   }
 

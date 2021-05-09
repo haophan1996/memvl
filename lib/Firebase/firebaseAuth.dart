@@ -15,14 +15,21 @@ class FireBaseAuthentication extends GetxController {
 
   void setData() {
     userCurrent = _firebaseAuth.currentUser;
-    final dbRef =
-        FirebaseDatabase.instance.reference().child("users").child(userCurrent.uid);
+    final dbRef = FirebaseDatabase.instance
+        .reference()
+        .child("users")
+        .child(userCurrent.uid);
     dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
       phone = (result.value['phone']).toString().obs;
       email = (userCurrent.email).obs;
       photoUrl = (userCurrent.photoURL).obs;
-      photoLink = await FirebaseStorage.instance.ref(photoUrl.value.toString()).getDownloadURL();
+      print(photoUrl);
+      if (photoUrl.value?.isNotEmpty == true) {
+        photoLink = await FirebaseStorage.instance
+            .ref(photoUrl.value.toString())
+            .getDownloadURL();
+      }
     });
   }
 
