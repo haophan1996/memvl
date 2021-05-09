@@ -65,7 +65,6 @@ class FireBaseAuthentication extends GetxController {
   }
 
   _onSignUpError(String code, Function(String) onRegisterError) {
-    print("Message: $code");
     switch (code) {
       case "unknown":
         onRegisterError("Cannot connect to sever. Please try again later");

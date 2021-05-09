@@ -1,7 +1,6 @@
 # mem_vl
 
-Believe it or not This application will make people laugh out loud. Feeling sad, no worries, this app will make you happy whenver you open it
-
+Meme Vl application
 ## Getting Started
 
 This project is a starting point for a Flutter application.
