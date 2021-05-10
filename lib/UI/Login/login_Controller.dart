@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
-
 import '../../Util/UI_Loading.dart';
 
 class LoginController extends GetxController {
@@ -29,17 +28,17 @@ class LoginController extends GetxController {
   @override
   Future<void> onReady() {
     super.onReady();
+    SetDialog().setLoading();
     if (FirebaseAuth.instance.currentUser !=null)   {
-      fireBaseAuthentication.setData(() async {
-        await signInUser();
+      fireBaseAuthentication.setData(()  {
+        Get.back();
+        signInUser();
       });
-    }
+    } else Get.back();
   }
-
 
   void togglePassword() {
     isHidden.value = isHidden.value ? false : true;
-    print(isHidden);
   }
 
   void signInUser(){
