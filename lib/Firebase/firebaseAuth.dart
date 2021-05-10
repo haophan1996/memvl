@@ -13,12 +13,9 @@ class FireBaseAuthentication extends GetxController {
   var photoLink;
   User userCurrent;
 
-  void setData() {
+  void setData(Function onSuccess) {
     userCurrent = _firebaseAuth.currentUser;
-    final dbRef = FirebaseDatabase.instance
-        .reference()
-        .child("users")
-        .child(userCurrent.uid);
+    final dbRef = FirebaseDatabase.instance.reference().child("users").child(userCurrent.uid);
     dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
       phone = (result.value['phone']).toString().obs;
@@ -26,27 +23,33 @@ class FireBaseAuthentication extends GetxController {
       photoUrl = (userCurrent.photoURL).obs;
       print(photoUrl);
       if (photoUrl.value?.isNotEmpty == true) {
-        photoLink = await FirebaseStorage.instance
+         await FirebaseStorage.instance
             .ref(photoUrl.value.toString())
-            .getDownloadURL();
+            .getDownloadURL()
+            .then((value) {
+          photoLink = value;
+          onSuccess();
+        }).catchError((onError) {
+          print("Set data: $onError");
+        });
       }
     });
   }
 
-  Future<void> signIn(String email, String password, Function onSuccess,
-      Function(String) onSignInError) async {
-    await _firebaseAuth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((user) {
-      setData();
+  Future<void> signIn(
+      String email, String password, Function onSuccess, Function(String) onSignInError) async {
+    await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).then((user) {
+      setData(() {
+        print("loaded link profile");
+      });
       onSuccess();
     }).catchError((err) {
       onSignInError(err.code);
     });
   }
 
-  Future<void> signUp(String email, String password, String name, String phone,
-      Function onSuccess, Function(String) onRegisterError) async {
+  Future<void> signUp(String email, String password, String name, String phone, Function onSuccess,
+      Function(String) onRegisterError) async {
     await _firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((user) {

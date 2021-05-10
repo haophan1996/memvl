@@ -29,7 +29,11 @@ class LoginController extends GetxController {
   @override
   Future<void> onReady() {
     super.onReady();
-    if (FirebaseAuth.instance.currentUser !=null) signInUser();
+    if (FirebaseAuth.instance.currentUser !=null)   {
+      fireBaseAuthentication.setData(() async {
+        await signInUser();
+      });
+    }
   }
 
 
@@ -39,12 +43,11 @@ class LoginController extends GetxController {
   }
 
   void signInUser(){
-    Get.off(DashBoardUI(), binding: DashBoardBing());
+    Get.off(() => DashBoardUI(), binding: DashBoardBing());
   }
 
   void signIn() {
-    fireBaseAuthentication.signIn(controller_email.text, controller_pass.text,
-        () {
+    fireBaseAuthentication.signIn(controller_email.text, controller_pass.text,() {
       //On success
       Get.back();
       signInUser();

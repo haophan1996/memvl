@@ -5,6 +5,7 @@ import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:mem_vl/UI/Register/register_Binding.dart';
 import 'package:mem_vl/UI/Register/register_UI.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
+import 'package:mem_vl/Util/UI_Loading.dart';
 import 'login_Controller.dart';
 
 class LoginUI extends GetView<LoginController> {
@@ -68,11 +69,7 @@ class LoginUI extends GetView<LoginController> {
                       child: RaisedButton(
                         onPressed: () {
                           if (controller.isValid() == true) {
-                            Get.defaultDialog(
-                              content: CircularProgressIndicator(),
-                              barrierDismissible: false,
-                              title: "Status",
-                            );
+                            SetDialog().setLoading();
                             controller.signIn();
                           }
                         },

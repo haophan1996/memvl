@@ -42,7 +42,7 @@ class ProfileUI extends GetView<ProfileController> {
                     color: Color(0xFFF5F6F9),
                     onPressed: () async {
                       controller.getUploadImage();
-                      print(controller.fireBaseAuthentication.photoLink.toString().length);
+                      print(controller.fireBaseAuthentication.photoLink);
                     },
                     child: Image.asset("ic_image_upload.png"),
                   ),

@@ -15,6 +15,8 @@ Future<void> main() async {
   LoginBinding().dependencies();
   Get.put<FireBaseAuthentication>(FireBaseAuthentication());
   Get.put<FireBaseUploadImage>(FireBaseUploadImage());
-  if (FirebaseAuth.instance.currentUser != null) FireBaseAuthentication.i.setData();
+   if (FirebaseAuth.instance.currentUser != null) {
+     await FirebaseAuth.instance.currentUser.reload();
+   }
   runApp(LoginUI());
 }
