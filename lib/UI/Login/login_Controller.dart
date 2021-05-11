@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
+import 'package:mem_vl/UI/Pages/Home/HomePage_Binding.dart';
+import 'package:mem_vl/UI/Pages/Profile/Profile_Binding.dart';
 import '../../Util/UI_Loading.dart';
 
 class LoginController extends GetxController {
@@ -28,6 +30,8 @@ class LoginController extends GetxController {
   @override
   Future<void> onReady() {
     super.onReady();
+    ProfileBinding().dependencies();
+    HomePageBinding().dependencies();
     SetDialog().setLoading();
     if (FirebaseAuth.instance.currentUser !=null)   {
       fireBaseAuthentication.setData(()  {

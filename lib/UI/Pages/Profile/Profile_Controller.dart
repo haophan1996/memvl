@@ -11,7 +11,31 @@ class ProfileController extends GetxController {
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
   final FireBaseUploadImage fireBaseUploadImage = Get.find();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  List myList;
+  ScrollController scrollControllerr = ScrollController();
+  var _currentMax = 10;
   var imagePath = "".obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    myList = List
+        .generate(5, (i) => "Item: ${i + 1}")
+        .obs;
+    scrollControllerr.addListener(() {
+      if (scrollControllerr.position.pixels == scrollControllerr.position.maxScrollExtent) {
+        loadMore();
+      }
+    });
+  }
+
+   loadMore() {
+    for(var i = _currentMax; i < _currentMax+10;i++){
+      myList.add("Item: ${i+1}");
+    }
+    _currentMax = _currentMax +10;
+  }
+
 
   getUploadImage() async {
     fireBaseUploadImage.getImage((value) {

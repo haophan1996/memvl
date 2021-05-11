@@ -8,43 +8,69 @@ import 'package:cached_network_image/cached_network_image.dart';
 class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(top: 25),
+              height: MediaQuery.of(context).size.height,
+              width: double.infinity,
+              child: Obx(
+                () => ListView.builder(
+                    physics: ClampingScrollPhysics(),
+                    controller: controller.scrollControllerr,
+                    itemCount: controller.myList.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index == controller.myList.length) {
+                        return CupertinoActivityIndicator();
+                      }
+                      if (index == 0) {
+                        return userProfile(context);
+                      } else
+                        return userList(context, index);
+                    }),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget userProfile(BuildContext context) {
     return Column(
       children: [
         SizedBox(
-          height: 20,
-        ),
-        SizedBox(
-          height: 115,
-          width: 115,
+          height: 120,
+          width: 120,
           child: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              Obx(
-                () => CircleAvatar(
-                  backgroundImage: controller.fireBaseAuthentication.photoUrl.value == null
-                      ? AssetImage("assets/signup_banner.png")
-                      : controller.fireBaseAuthentication.photoLink.toString().length < 5
-                          ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value)).image
-                          : CachedNetworkImageProvider(controller.fireBaseAuthentication.photoLink),
-                ),
+              FlatButton(
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+
+                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                    side: BorderSide(color: Colors.red,width: 10)),
+                color: Colors.white,
+                onPressed: () async {
+                  controller.getUploadImage();
+                },
               ),
-              Positioned(
-                right: -12,
-                bottom: 0,
-                child: SizedBox(
-                  height: 46,
-                  width: 46,
-                  child: FlatButton(
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(60),
-                        side: BorderSide(color: Colors.black)),
-                    color: Color(0xFFF5F6F9),
-                    onPressed: () async {
-                      controller.getUploadImage();
-                      print(controller.fireBaseAuthentication.photoLink);
-                    },
-                    child: Image.asset("ic_image_upload.png"),
+              InkWell(
+                onTap: () async {
+                  controller.getUploadImage();
+                },
+                child: Obx(
+                      () => CircleAvatar(
+                    backgroundImage: controller.fireBaseAuthentication.photoUrl.value == null
+                        ? AssetImage("assets/signup_banner.png")
+                        : controller.fireBaseAuthentication.photoLink.toString().length < 5
+                        ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
+                        .image
+                        : CachedNetworkImageProvider(
+                        controller.fireBaseAuthentication.photoLink),
                   ),
                 ),
               ),
@@ -102,4 +128,75 @@ class ProfileUI extends GetView<ProfileController> {
       ],
     );
   }
+}
+
+Widget userList(BuildContext context, int index) {
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius:
+          BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+      color: Colors.black12,
+    ),
+    width: double.infinity,
+    height: 120,
+    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Center(
+          child: Container(
+              width: 70,
+              height: 70,
+              margin: EdgeInsets.only(right: 15),
+              child: Image(image: AssetImage('assets/signup_banner.png'))),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                "details[index]['name']",
+                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              SizedBox(
+                height: 6,
+              ),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.location_on,
+                    color: Colors.cyanAccent,
+                    size: 20,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text("details[index]['country']",
+                      style: TextStyle(color: Colors.amberAccent, fontSize: 13, letterSpacing: .3)),
+                ],
+              ),
+              SizedBox(
+                height: 6,
+              ),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.call,
+                    color: Colors.cyanAccent,
+                    size: 20,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text("details[index]['mobile']",
+                      style: TextStyle(color: Colors.amber, fontSize: 13, letterSpacing: .3)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
