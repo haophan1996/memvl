@@ -1,8 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 // ignore: camel_case_types
 class UI_Helper {
+
+  setDialogMessage(String content, bool isTwoGetBack) {
+    Get.back();
+    Get.defaultDialog(
+      title: "Status",
+      content: Text(content),
+      textConfirm: "Ok",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.green,
+      onConfirm: () {
+        Get.back();
+        if (isTwoGetBack) Get.back();
+      },
+    );
+  }
+
+  setLoading() {
+    Get.defaultDialog(
+        content: CircularProgressIndicator(),
+        barrierDismissible: false,
+        title: "Loading...");
+  }
+
   createTextField(
     TextEditingController controller,
     double left,

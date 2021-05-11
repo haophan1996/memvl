@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 import '../../Firebase/firebaseUploadImage.dart';
-import '../../Util/UI_Loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterController extends GetxController {
@@ -44,16 +44,16 @@ class RegisterController extends GetxController {
           .then((value) async {
         fireBaseAuthentication.userCurrent.reload();
         print(fireBaseAuthentication.userCurrent.photoURL);
-        SetDialog().setDialogMessage("Thank you for singning up",true);
+        UI_Helper().setDialogMessage("Thank you for singning up",true);
         print("signup success");
       }).catchError((onError) {
-        SetDialog().setDialogMessage(onError.toString(),false);
+        UI_Helper().setDialogMessage(onError.toString(),false);
       });
     });
   }
 
   void signup() {
-    SetDialog().setLoading();
+    UI_Helper().setLoading();
     fireBaseAuthentication.signUp(
         myController_email.text,
         myController_pass.text,
@@ -64,11 +64,11 @@ class RegisterController extends GetxController {
         uploadImage();
       } else {
         print("here");
-        SetDialog().setDialogMessage("Thank you for singning up",true);
+        UI_Helper().setDialogMessage("Thank you for singning up",true);
       }
     }, (msg) {
           // If fail, then print error to user
-      SetDialog().setDialogMessage(msg.toString(),false);
+      UI_Helper().setDialogMessage(msg.toString(),false);
       print(msg.toString());
     });
   }

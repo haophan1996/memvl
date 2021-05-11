@@ -8,7 +8,7 @@ import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
 import 'package:mem_vl/UI/Pages/Home/HomePage_Binding.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Binding.dart';
-import '../../Util/UI_Loading.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 
 class LoginController extends GetxController {
   static LoginController get instance => Get.find<LoginController>();
@@ -22,7 +22,7 @@ class LoginController extends GetxController {
   final controller_pass = TextEditingController();
 
   @override
-  void onInit(){
+  void onInit() {
     super.onInit();
     print("check");
   }
@@ -32,31 +32,32 @@ class LoginController extends GetxController {
     super.onReady();
     ProfileBinding().dependencies();
     HomePageBinding().dependencies();
-    SetDialog().setLoading();
-    if (FirebaseAuth.instance.currentUser !=null)   {
-      fireBaseAuthentication.setData(()  {
+    UI_Helper().setLoading();
+    if (FirebaseAuth.instance.currentUser != null) {
+      fireBaseAuthentication.setData(() {
         Get.back();
         signInUser();
       });
-    } else Get.back();
+    } else
+      Get.back();
   }
 
   void togglePassword() {
     isHidden.value = isHidden.value ? false : true;
   }
 
-  void signInUser(){
+  void signInUser() {
     Get.off(() => DashBoardUI(), binding: DashBoardBing());
   }
 
   void signIn() {
-    fireBaseAuthentication.signIn(controller_email.text, controller_pass.text,() {
+    fireBaseAuthentication.signIn(controller_email.text, controller_pass.text, () {
       //On success
       Get.back();
       signInUser();
     }, (msg) {
       //On fail
-       SetDialog().setDialogMessage(msg , false);
+      UI_Helper().setDialogMessage(msg, false);
     });
   }
 
@@ -65,8 +66,7 @@ class LoginController extends GetxController {
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
 
-    if (controller_email.text.length < 0 ||
-        !regex.hasMatch(controller_email.text)) {
+    if (controller_email.text.length < 0 || !regex.hasMatch(controller_email.text)) {
       isEmailValid.value = true;
     } else
       isEmailValid.value = false;

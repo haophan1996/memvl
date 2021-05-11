@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/Firebase/firebaseUploadImage.dart';
-import '../../../Util/UI_Loading.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 
 class ProfileController extends GetxController {
   static ProfileController get instance => Get.find<ProfileController>();
@@ -40,7 +40,7 @@ class ProfileController extends GetxController {
   getUploadImage() async {
     fireBaseUploadImage.getImage((value) {
       if (value.length > 2) {
-        SetDialog().setLoading();
+        UI_Helper().setLoading();
         imagePath.value = value;
         fireBaseUploadImage.uploadImage(imagePath.value, (path) async {
           //onSuccess
@@ -56,9 +56,9 @@ class ProfileController extends GetxController {
             fireBaseAuthentication.userCurrent.reload();
             fireBaseAuthentication.photoLink = null;
             fireBaseAuthentication.photoUrl.value = imagePath.value.toString();
-            SetDialog().setDialogMessage("Updated",false);
+            UI_Helper().setDialogMessage("Updated",false);
           }).catchError((onError) {
-            SetDialog().setDialogMessage(onError.toString(),false);
+            UI_Helper().setDialogMessage(onError.toString(),false);
           });
         });
       }

@@ -1,5 +1,4 @@
-import 'dart:async';
-import 'dart:io';
+ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:mem_vl/UI/Register/register_Controller.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
-import 'package:mem_vl/Util/UI_Loading.dart';
 import 'register_Controller.dart';
 
 class RegisterUI extends GetView<RegisterController> {
