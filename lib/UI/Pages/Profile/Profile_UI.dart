@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ProfileUI extends GetView<ProfileController> {
   @override
@@ -47,12 +48,10 @@ class ProfileUI extends GetView<ProfileController> {
         width: double.infinity,
         decoration: BoxDecoration(
             shape: BoxShape.rectangle,
-            boxShadow: [
-              BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
-            ],
+            boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
             borderRadius: BorderRadius.all(Radius.circular(5)),
             image: DecorationImage(
-              image: CachedNetworkImageProvider(controller.myPro.elementAt(index).Image) ,
+              image: CachedNetworkImageProvider(controller.myPro.elementAt(index).Image),
               fit: BoxFit.contain,
             )),
       );
@@ -65,17 +64,29 @@ class ProfileUI extends GetView<ProfileController> {
             letterSpacing: 1.4,
           ));
     } else if (controller.myPro.elementAt(index).Type == "Video") {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(
-            'login_banner.png',
-            height: 100,
-            width: 100,
+      return Column(
+        children: <Widget>[
+          Container(
+            height: 250,
+            width: double.infinity,
+            decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                image: DecorationImage(
+                  // YoutubePlayer.convertUrlToId(controller.myPro.elementAt(index).Video)
+                  image: CachedNetworkImageProvider("https://img.youtube.com/vi/${YoutubePlayer.convertUrlToId(controller.myPro.elementAt(index).Video)}/0.jpg" ),
+                  fit: BoxFit.contain,
+                )),
           ),
-          Flexible(
+          SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+                borderRadius: BorderRadius.all(Radius.circular(5))),
             child: Text(
-              "Still working on it",
+              controller.myPro.elementAt(index).VideoTitle,
               style: TextStyle(
                 fontSize: 15,
                 color: Color(0xFFF101113),

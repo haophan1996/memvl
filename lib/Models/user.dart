@@ -1,8 +1,8 @@
 
 class ProfileModel {
   final String UserID ;
-  final String Video;
   final String VideoTitle;
+  final String Video;
   final String Text;
   final String Title;
   final String Type;
