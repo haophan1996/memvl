@@ -1,14 +1,16 @@
-import 'package:firebase_database/firebase_database.dart';
 
-class UserModel {
-  final String name;
-  final String phone;
-  final String email;
+class ProfileModel {
+  final String UserID ;
+  final String Video;
+  final String VideoTitle;
+  final String Text;
+  final String Title;
+  final String Type;
+  final String Image;
+  final String Date;
+  final String PostID;
+  final String userPhoto;
 
-  UserModel({this.email, this.name, this.phone});
+  ProfileModel(this.UserID, this.VideoTitle, this.Video,this.Text, this.Title, this.Type, this.Image, this.Date, this.PostID, this.userPhoto);
 
-  UserModel.fromSnapShot(DataSnapshot snapshot)
-      : name = snapshot.value["name"],
-        email = snapshot.value["email"],
-        phone = snapshot.value["phone"];
 }

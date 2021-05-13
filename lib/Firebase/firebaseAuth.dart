@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
-  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   RxString name = "".obs;
   RxString phone = "".obs;
   RxString email = "".obs;
@@ -14,7 +14,7 @@ class FireBaseAuthentication extends GetxController {
   User userCurrent;
 
   void setData(Function onSuccess) {
-    userCurrent = _firebaseAuth.currentUser;
+    userCurrent = firebaseAuth.currentUser;
     final dbRef = FirebaseDatabase.instance.reference().child("users").child(userCurrent.uid);
     dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
@@ -38,7 +38,7 @@ class FireBaseAuthentication extends GetxController {
 
   Future<void> signIn(
       String email, String password, Function onSuccess, Function(String) onSignInError) async {
-    await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).then((user) {
+    await firebaseAuth.signInWithEmailAndPassword(email: email, password: password).then((user) {
       setData(() {
         print("loaded link profile");
       });
@@ -50,7 +50,7 @@ class FireBaseAuthentication extends GetxController {
 
   Future<void> signUp(String email, String password, String name, String phone, Function onSuccess,
       Function(String) onRegisterError) async {
-    await _firebaseAuth
+    await firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((user) {
       userCurrent = user.user;

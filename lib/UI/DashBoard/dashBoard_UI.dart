@@ -13,6 +13,13 @@ class DashBoardUI extends GetView<DashBoardController> {
             body: Obx(() => Center(
               child: controller.widgetOption.elementAt(controller.selectedIndex.value),
             )),
+
+            floatingActionButton: FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: (){},
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
+
             bottomNavigationBar: Obx(() =>
                 BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,

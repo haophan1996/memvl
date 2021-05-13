@@ -9,31 +9,142 @@ class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(top: 25),
-              height: MediaQuery.of(context).size.height,
-              width: double.infinity,
-              child: Obx(
+      body: SizedBox.expand(
+        child: Container(
+          padding: EdgeInsets.only(top: 15),
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          child: Stack(
+            children: <Widget>[
+              Obx(
                 () => ListView.builder(
                     physics: ClampingScrollPhysics(),
-                    controller: controller.scrollControllerr,
-                    itemCount: controller.myList.length + 1,
+                    controller: controller.scrollController,
+                    itemCount: controller.myPro.length + 1,
                     itemBuilder: (BuildContext context, int index) {
-                      if (index == controller.myList.length) {
-                        return CupertinoActivityIndicator();
+                      if (index == controller.myPro.length) {
+                        return controller.totalPost != controller.lastIndex
+                            ? CupertinoActivityIndicator()
+                            : Container();
                       }
                       if (index == 0) {
                         return userProfile(context);
-                      } else
-                        return userList(context, index);
+                      }
+                      return userList(context, controller, index);
                     }),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  getContentSubList(int index) {
+    if (controller.myPro.elementAt(index).Type == "Image") {
+      return Container(
+        height: 250,
+        width: double.infinity,
+        decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            boxShadow: [
+              BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
+            ],
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            image: DecorationImage(
+              image: CachedNetworkImageProvider(controller.myPro.elementAt(index).Image) ,
+              fit: BoxFit.contain,
+            )),
+      );
+    } else if (controller.myPro.elementAt(index).Type == "Text") {
+      return Text(controller.myPro.elementAt(index).Text,
+          style: TextStyle(
+            fontSize: 15,
+            color: Color(0xFFF101113),
+            height: 1.4,
+            letterSpacing: 1.4,
+          ));
+    } else if (controller.myPro.elementAt(index).Type == "Video") {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image.asset(
+            'login_banner.png',
+            height: 100,
+            width: 100,
+          ),
+          Flexible(
+            child: Text(
+              "Still working on it",
+              style: TextStyle(
+                fontSize: 15,
+                color: Color(0xFFF101113),
+                height: 1.4,
+                letterSpacing: 1.4,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget userList(BuildContext context, ProfileController controller, int index) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+        color: Colors.black12,
+      ),
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: Column(
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: controller.myPro.elementAt(index).userPhoto.length > 6
+                          ? CachedNetworkImageProvider(controller.myPro.elementAt(index).userPhoto)
+                          : AssetImage('assets/signup_banner.png'),
+                      fit: BoxFit.cover,
+                    )),
+              ),
+              SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(controller.myPro.elementAt(index).Title,
+                      style: TextStyle(
+                          color: Color(0xFFF101113), fontSize: 19, fontWeight: FontWeight.bold)),
+                  SizedBox(width: 3),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(controller.myPro.elementAt(index).Date,
+                          style: TextStyle(fontSize: 15, color: Color(0xFFF101113))),
+                      SizedBox(width: 3),
+                      Icon(Icons.history, color: Color(0xFFF101113), size: 18)
+                    ],
+                  ),
+                ],
+              ),
+              Spacer(),
+              IconButton(
+                icon: Icon(Icons.more_horiz, color: Color(0xFFF101113), size: 30),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          getContentSubList(index),
+        ],
       ),
     );
   }
@@ -50,9 +161,8 @@ class ProfileUI extends GetView<ProfileController> {
               FlatButton(
                 padding: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-
                     borderRadius: BorderRadius.all(Radius.circular(50)),
-                    side: BorderSide(color: Colors.red,width: 10)),
+                    side: BorderSide(color: Colors.red, width: 10)),
                 color: Colors.white,
                 onPressed: () async {
                   controller.getUploadImage();
@@ -63,14 +173,14 @@ class ProfileUI extends GetView<ProfileController> {
                   controller.getUploadImage();
                 },
                 child: Obx(
-                      () => CircleAvatar(
+                  () => CircleAvatar(
                     backgroundImage: controller.fireBaseAuthentication.photoUrl.value == null
                         ? AssetImage("assets/signup_banner.png")
                         : controller.fireBaseAuthentication.photoLink.toString().length < 5
-                        ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
-                        .image
-                        : CachedNetworkImageProvider(
-                        controller.fireBaseAuthentication.photoLink),
+                            ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
+                                .image
+                            : CachedNetworkImageProvider(
+                                controller.fireBaseAuthentication.photoLink),
                   ),
                 ),
               ),
@@ -125,12 +235,13 @@ class ProfileUI extends GetView<ProfileController> {
             ),
           ),
         ),
+        SizedBox(height: 10)
       ],
     );
   }
 }
 
-Widget userList(BuildContext context, int index) {
+/*Widget userList(BuildContext context, ProfileController controller, int index) {
   return Container(
     decoration: BoxDecoration(
       borderRadius:
@@ -156,7 +267,7 @@ Widget userList(BuildContext context, int index) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                "details[index]['name']",
+                controller.myPro.elementAt(index).Title,
                 style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 18),
               ),
               SizedBox(
@@ -200,3 +311,4 @@ Widget userList(BuildContext context, int index) {
     ),
   );
 }
+*/
