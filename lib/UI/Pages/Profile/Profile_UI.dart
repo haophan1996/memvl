@@ -10,26 +10,22 @@ class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Obx(
-                () => ListView.builder(
-                physics: ClampingScrollPhysics(),
-                controller: controller.scrollController,
-                itemCount: controller.myPro.length + 1,
-                itemBuilder: (BuildContext context, int index) {
-                  if (index == controller.myPro.length) {
-                    return (controller.totalPost+1) != (controller.myPro.length)
-                        ? CupertinoActivityIndicator()
-                        : Container();
-                  }
-                  if (index == 0) {
-                    return userProfile(context);
-                  }
-                  return userList(context, controller, index);
-                }),
-          ),
-        ],
+      body: Obx(
+            () => ListView.builder(
+            //physics: ClampingScrollPhysics(),
+            controller: controller.scrollController,
+            itemCount: controller.myPro.length + 1,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == controller.myPro.length) {
+                return (controller.totalPost+1) != (controller.myPro.length)
+                    ? CupertinoActivityIndicator()
+                    : Container();
+              }
+              if (index == 0) {
+                return userProfile(context);
+              }
+              return userList(context, controller, index);
+            }),
       ),
     );
   }
