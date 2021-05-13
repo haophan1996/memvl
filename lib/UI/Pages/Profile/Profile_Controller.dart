@@ -99,26 +99,30 @@ class ProfileController extends GetxController {
     var image;
     var imageProfile;
     var title;
-    for(var element in myl) {
+    for (var element in myl) {
       await _firebaseDatabase
           .reference()
           .child("PostID/$element")
           .once()
           .then((DataSnapshot dataSnap) async {
 
-        if (dataSnap.value['userPhoto'].toString().length > 5){
-          await getLinkImage(dataSnap.value['userPhoto'].toString(), (val) {
+
+        await getPathPhotoUser(dataSnap.value['UserID'].toString(),(vals) async {
+          await getLinkImage(vals, (val) async {
             imageProfile = val;
           });
-        }
-        if (dataSnap.value['Type'].toString() == "Image"){
+        });
+
+
+        if (dataSnap.value['Type'].toString() == "Image") {
           await getLinkImage(dataSnap.value['Image'].toString(), (val) {
             image = val;
           });
-        } else if (dataSnap.value['Type'].toString() == "Video"){
-           var get = await yt.videos.get(dataSnap.value['Video'].toString());
-            title = get.title;
+        } else if (dataSnap.value['Type'].toString() == "Video") {
+          var get = await yt.videos.get(dataSnap.value['Video'].toString());
+          title = get.title;
         }
+
         myPro.add(ProfileModel(
             dataSnap.value['UserID'].toString(),
             await title,
@@ -134,9 +138,15 @@ class ProfileController extends GetxController {
     }
   }
 
+  getPathPhotoUser(String userID,Function(String) onPathPhotoURL) async {
+    await _firebaseStorage.ref("ProfileUser/$userID/").listAll().then((value) async {
+      await onPathPhotoURL(value.items.first.fullPath);
+    });
+  }
+
   getLinkImage(String image, Function(String) onResultLinkImage) async {
-    await _firebaseStorage.ref(image).getDownloadURL().then((value) {
-      onResultLinkImage(value);
+    await _firebaseStorage.ref(image).getDownloadURL().then((value) async {
+      await onResultLinkImage(value);
     });
   }
 
