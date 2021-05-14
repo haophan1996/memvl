@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dashBoard_Controller.dart';
+import 'package:mem_vl/UI/Pages/Upload/upload_UI.dart';
+import 'package:mem_vl/UI/Pages/Upload/upload_Binding.dart';
 
 class DashBoardUI extends GetView<DashBoardController> {
   @override
@@ -16,7 +18,9 @@ class DashBoardUI extends GetView<DashBoardController> {
 
             floatingActionButton: FloatingActionButton(
               child: Icon(Icons.add),
-              onPressed: (){},
+              onPressed: (){
+                Get.to(()=> UploadUI(), binding: UploadBinding());
+              },
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
 
