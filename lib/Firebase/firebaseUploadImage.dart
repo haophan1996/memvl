@@ -15,7 +15,7 @@ class FireBaseUploadImage extends GetxController {
       image = File(pickerFile.path);
       prepare(image.path);
     } else{
-      prepare("");
+      prepare("none");
       print("No file selected");
     }
   }

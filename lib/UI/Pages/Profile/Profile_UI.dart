@@ -104,18 +104,25 @@ class ProfileUI extends GetView<ProfileController> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Container(
+              Obx(()=> Container(
                 height: 50,
                 width: 50,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: controller.myPro.elementAt(index).userPhoto.length > 6
-                          ? CachedNetworkImageProvider(controller.myPro.elementAt(index).userPhoto)
-                          : AssetImage('assets/signup_banner.png'),
+                      image:controller.fireBaseAuthentication.photoUrl.value == null
+                          ? AssetImage("assets/signup_banner.png")
+                          : controller.fireBaseAuthentication.photoLink.toString().length < 5
+                          ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
+                          .image
+                          : CachedNetworkImageProvider(
+                          controller.fireBaseAuthentication.photoLink),
+                      //controller.myPro.elementAt(index).userPhoto.length > 6
+                      //     ? CachedNetworkImageProvider(controller.myPro.elementAt(index).userPhoto)
+                      //     : AssetImage('assets/signup_banner.png'),
                       fit: BoxFit.cover,
                     )),
-              ),
+              ),),
               SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,75 +247,3 @@ class ProfileUI extends GetView<ProfileController> {
     );
   }
 }
-
-/*Widget userList(BuildContext context, ProfileController controller, int index) {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius:
-          BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
-      color: Colors.black12,
-    ),
-    width: double.infinity,
-    height: 120,
-    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Center(
-          child: Container(
-              width: 70,
-              height: 70,
-              margin: EdgeInsets.only(right: 15),
-              child: Image(image: AssetImage('assets/signup_banner.png'))),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                controller.myPro.elementAt(index).Title,
-                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.location_on,
-                    color: Colors.cyanAccent,
-                    size: 20,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text("details[index]['country']",
-                      style: TextStyle(color: Colors.amberAccent, fontSize: 13, letterSpacing: .3)),
-                ],
-              ),
-              SizedBox(
-                height: 6,
-              ),
-              Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.call,
-                    color: Colors.cyanAccent,
-                    size: 20,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text("details[index]['mobile']",
-                      style: TextStyle(color: Colors.amber, fontSize: 13, letterSpacing: .3)),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-*/
