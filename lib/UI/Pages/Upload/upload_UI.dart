@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:mem_vl/UI/Pages/Upload/upload_Controller.dart';
 import 'package:get/get.dart';
@@ -12,8 +13,10 @@ class UploadUI extends GetView<UploadController> {
   @override
   Widget build(BuildContext context) {
     return KeyboardDismisser(
+      behavior: HitTestBehavior.deferToChild,
       gestures: [GestureType.onTap],
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           actions: <Widget>[
             TextButton(
@@ -44,14 +47,21 @@ class UploadUI extends GetView<UploadController> {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: controller.fireBaseAuthentication.photoUrl.value == null
+                          image: controller
+                                      .fireBaseAuthentication.photoUrl.value ==
+                                  null
                               ? AssetImage("assets/signup_banner.png")
-                              : controller.fireBaseAuthentication.photoLink.toString().length < 5
-                                  ? Image.file(
-                                          File(controller.fireBaseAuthentication.photoUrl.value))
+                              : controller.fireBaseAuthentication.photoLink
+                                          .toString()
+                                          .length <
+                                      5
+                                  ? Image.file(File(controller
+                                          .fireBaseAuthentication
+                                          .photoUrl
+                                          .value))
                                       .image
-                                  : CachedNetworkImageProvider(
-                                      controller.fireBaseAuthentication.photoLink),
+                                  : CachedNetworkImageProvider(controller
+                                      .fireBaseAuthentication.photoLink),
                           fit: BoxFit.cover,
                         )),
                   ),
@@ -59,8 +69,10 @@ class UploadUI extends GetView<UploadController> {
                     padding: EdgeInsets.only(left: 10),
                     child: Text(
                       controller.fireBaseAuthentication.name.value,
-                      style:
-                          TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   //Text("Post Something"),
@@ -85,7 +97,12 @@ class UploadUI extends GetView<UploadController> {
                 ),
               ),
               Expanded(
-                child: Obx(() => (controller.path.value.length < 5 ? youtubePost() : imagePost())),
+                child: Obx(() => (controller.type.value == 0
+                    ? Container()
+                    : controller.type.value == 1
+                        ? imagePost()
+                        : youtubePost())),
+                //Obx(() => (controller.path.value.length < 5 ? youtubePost() : imagePost())),
               ),
               Container(
                 height: 50,
@@ -100,8 +117,10 @@ class UploadUI extends GetView<UploadController> {
                   children: <Widget>[
                     Text(
                       " Add to your post",
-                      style:
-                          TextStyle(fontSize: 17, color: Colors.black, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                     ),
                     Spacer(),
                     IconButton(
@@ -123,15 +142,19 @@ class UploadUI extends GetView<UploadController> {
                                 Obx(
                                   () => TextField(
                                     controller: controller.inputYoutube,
-                                    style: TextStyle(fontSize: 18, color: Colors.black),
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.black),
                                     decoration: InputDecoration(
-                                      errorText: controller.isValidInputYoutube.value
-                                          ? "Invalid Link"
-                                          : null,
+                                      errorText:
+                                          controller.isValidInputYoutube.value
+                                              ? "Invalid Link"
+                                              : null,
                                       labelText: "Youtube Link",
                                       border: OutlineInputBorder(
-                                        borderSide: BorderSide(color: Color(0xffCED0D2), width: 1),
-                                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                                        borderSide: BorderSide(
+                                            color: Color(0xffCED0D2), width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(6)),
                                       ),
                                     ),
                                   ),
@@ -140,7 +163,9 @@ class UploadUI extends GetView<UploadController> {
                                   children: [
                                     TextButton(
                                         onPressed: () {
-                                          if (controller.checkInputYoutube() == true) {
+                                          if (controller.checkInputYoutube() ==
+                                              true) {
+                                            controller.type.value = 2;
                                             controller.path.value = "";
                                             Get.back();
                                           }
@@ -149,7 +174,9 @@ class UploadUI extends GetView<UploadController> {
                                     Spacer(),
                                     TextButton(
                                         onPressed: () {
-                                          if (controller.isValidInputYoutube.value == true) {
+                                          if (controller
+                                                  .isValidInputYoutube.value ==
+                                              true) {
                                             controller.inputYoutube.text = "";
                                           }
                                           Get.back();
@@ -172,11 +199,35 @@ class UploadUI extends GetView<UploadController> {
   }
 
   imagePost() {
-    return Container(
-      height: 300,
-      decoration: BoxDecoration(
-        image: DecorationImage(image: Image.file(File(controller.path.value)).image),
-      ),
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        Container(
+          // height: 200,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            image: DecorationImage(
+                alignment: Alignment.topCenter,
+                image: Image.file(File(controller.path.value)).image),
+          ),
+        ),
+        Positioned(
+            top: -10,
+            right: -25,
+            child: TextButton(
+              onPressed: (){
+                controller.getRemoveMedia();
+              },
+              child: Text(
+                "X",
+                style: TextStyle(
+                    backgroundColor: Colors.grey,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold),
+              ),
+            )),
+      ],
     );
   }
 
@@ -184,17 +235,25 @@ class UploadUI extends GetView<UploadController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Flexible(child: Container(
-          height: 200,
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+        Flexible(
+          child: Container(
+            alignment: Alignment.bottomCenter,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: Image.network("https://i.ytimg.com/an_webp/NBS7OlWbgS4/mqdefault_6s.webp?du=3000&sqp=CKLGioUG&rs=AOn4CLBb3eMRZQvwY2ouqZkOyCHXgqrw8A", scale: 1.0,).image
+              ),
+            ),
+            child: Text("cdscsd"),
           ),
-        ),),
+        ),
         Flexible(
             child: Text(
-          " asasccccccccccccccccccccccc",
+          "asasccccccccccccccccccccccc",
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ))

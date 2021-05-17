@@ -10,7 +10,7 @@ class UploadController extends GetxController {
   static UploadController get instance => Get.find<UploadController>();
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
   final FireBaseUploadImage fireBaseUploadImage = Get.find();
-  var type = 0; // 0 text, 1 image, 2 video
+  var type = 0.obs; // 0 text, 1 image, 2 video
   RxBool isValidInputYoutube = false.obs;
   File image;
   RxString path = "".obs;
@@ -21,11 +21,18 @@ class UploadController extends GetxController {
     print(textStatus);
   }
 
+  getRemoveMedia(){
+    path.value = "";
+    inputYoutube.text = "";
+    type.value = 0;
+  }
+
   getImage() {
     fireBaseUploadImage.image = null;
     fireBaseUploadImage.getImage((value) {
       if (value != "none") {
         path.value = value;
+        type.value = 1;
         inputYoutube.text = "";
       }
       print("selected image Status: $value");
