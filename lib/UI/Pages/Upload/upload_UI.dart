@@ -2,12 +2,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/Pages/Upload/upload_Controller.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:mem_vl/Util/UI_Helper.dart';
 
 class UploadUI extends GetView<UploadController> {
   @override
@@ -47,28 +48,25 @@ class UploadUI extends GetView<UploadController> {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: controller
-                                      .fireBaseAuthentication.photoUrl.value ==
+                          image: FireBaseAuthentication.i.photoUrl.value ==
                                   null
                               ? AssetImage("assets/signup_banner.png")
-                              : controller.fireBaseAuthentication.photoLink
+                              : FireBaseAuthentication.i.photoLink
                                           .toString()
                                           .length <
                                       5
-                                  ? Image.file(File(controller
-                                          .fireBaseAuthentication
+                                  ? Image.file(File(FireBaseAuthentication.i
                                           .photoUrl
                                           .value))
                                       .image
-                                  : CachedNetworkImageProvider(controller
-                                      .fireBaseAuthentication.photoLink),
+                                  : CachedNetworkImageProvider(FireBaseAuthentication.i.photoLink),
                           fit: BoxFit.cover,
                         )),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 10),
                     child: Text(
-                      controller.fireBaseAuthentication.name.value,
+                      FireBaseAuthentication.i.name.value,
                       style: TextStyle(
                           fontSize: 20,
                           color: Colors.black,
@@ -162,8 +160,8 @@ class UploadUI extends GetView<UploadController> {
                                 Row(
                                   children: [
                                     TextButton(
-                                        onPressed: () {
-                                          if (controller.checkInputYoutube() ==
+                                        onPressed: () async {
+                                          if (await controller.checkInputYoutube() ==
                                               true) {
                                             controller.type.value = 2;
                                             controller.path.value = "";
@@ -212,52 +210,72 @@ class UploadUI extends GetView<UploadController> {
                 image: Image.file(File(controller.path.value)).image),
           ),
         ),
-        Positioned(
-            top: -10,
-            right: -25,
-            child: TextButton(
-              onPressed: (){
-                controller.getRemoveMedia();
-              },
-              child: Text(
-                "X",
-                style: TextStyle(
-                    backgroundColor: Colors.grey,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-            )),
+        closeMediaButtonContainer(),
+        closeMediaButton()
       ],
     );
   }
 
   youtubePost() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Wrap(
       children: [
-        Flexible(
-          child: Container(
-            alignment: Alignment.bottomCenter,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-              image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: Image.network("https://i.ytimg.com/an_webp/NBS7OlWbgS4/mqdefault_6s.webp?du=3000&sqp=CKLGioUG&rs=AOn4CLBb3eMRZQvwY2ouqZkOyCHXgqrw8A", scale: 1.0,).image
-              ),
-            ),
-            child: Text("cdscsd"),
+        Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+            borderRadius: BorderRadius.all(Radius.circular(5)),
           ),
-        ),
-        Flexible(
-            child: Text(
-          "asasccccccccccccccccccccccc",
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-        ))
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  Obx(
+                    () => Image.network(
+                      "https://img.youtube.com/vi/${controller.idYoutube.value}/0.jpg",
+                    ),
+                  ),
+                  closeMediaButtonContainer(),
+                  closeMediaButton()
+                ],
+              ),
+              Obx(() => Text(
+                    "${controller.titleYoutube.value}",
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ))
+            ],
+          ),
+        )
       ],
+    );
+  }
+
+  closeMediaButtonContainer() {
+    return Positioned(
+      top: 5,
+      right: 5,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+      ),
+    );
+  }
+
+  closeMediaButton() {
+    return Positioned(
+      top: -8,
+      right: -8,
+      child: IconButton(
+        enableFeedback: true,
+        icon: Icon(Icons.close),
+        onPressed: () => controller.getRemoveMedia(),
+      ),
     );
   }
 }

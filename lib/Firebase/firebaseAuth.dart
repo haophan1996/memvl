@@ -6,27 +6,29 @@ import 'package:get/get.dart';
 class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
   RxString name = "".obs;
   RxString phone = "".obs;
   RxString email = "".obs;
   RxString photoUrl = "".obs;
+  RxInt postCount = 0.obs;
   var photoLink;
   User userCurrent;
 
-  void setData(Function onSuccess) {
+  setData(Function onSuccess) {
     userCurrent = firebaseAuth.currentUser;
-    final dbRef = FirebaseDatabase.instance.reference().child("users").child(userCurrent.uid);
+    final dbRef = firebaseDatabase.reference().child("users").child(userCurrent.uid);
     dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
       phone = (result.value['phone']).toString().obs;
       email = (userCurrent.email).obs;
       photoUrl = (userCurrent.photoURL).obs;
-      print(photoUrl);
       if (photoUrl.value?.isNotEmpty == true) {
          await FirebaseStorage.instance
             .ref(photoUrl.value.toString())
             .getDownloadURL()
             .then((value) {
+           print(value);
           photoLink = value;
           onSuccess();
         }).catchError((onError) {
@@ -34,6 +36,17 @@ class FireBaseAuthentication extends GetxController {
         });
       }
     });
+  }
+
+  listenPostCountUser()  {
+    firebaseDatabase
+        .reference()
+        .child(
+        "userCountPost/${getEmail()}/count/count/")
+      ..onValue.listen((event) {
+        print("Post Count User: ${event.snapshot.value}");
+        postCount.value = event.snapshot.value;
+      });
   }
 
   Future<void> signIn(
@@ -66,7 +79,7 @@ class FireBaseAuthentication extends GetxController {
       "name": name,
       "phone": phone,
     };
-    var ref = FirebaseDatabase.instance.reference().child("users");
+    var ref = firebaseDatabase.reference().child("users");
     ref.child(userId).set(user).then((user) {
       onSuccess();
     }).catchError((err) {
@@ -86,5 +99,11 @@ class FireBaseAuthentication extends GetxController {
         onRegisterError("Password is very weak, please Check again");
         break;
     }
+  }
+
+  String getEmail() {
+    return email
+        .replaceAll('@', '_')
+        .replaceAll('.', "_");
   }
 }

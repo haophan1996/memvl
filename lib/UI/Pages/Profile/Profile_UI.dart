@@ -173,7 +173,7 @@ class ProfileUI extends GetView<ProfileController> {
                 color: Colors.white,
                 onPressed: () async {
                   controller.getUploadImage();
-                },
+                }, child: null,
               ),
               InkWell(
                 onTap: () async {

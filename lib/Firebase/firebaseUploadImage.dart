@@ -20,21 +20,26 @@ class FireBaseUploadImage extends GetxController {
     }
   }
 
-  uploadImage(String imagePath, Function(String) onSuccess) async {
+  uploadImage(String folder, String imagePath, Function(String) onSuccess) async {
     print("uploadImage:  $imagePath");
     var firebaseStorage = FirebaseStorage.instance
         .ref()
-        .child("ProfileUser/${fireBaseAuthentication.userCurrent.email.replaceAll('@', '_').replaceAll('.', "_")}/${getFileName(imagePath)}");
+        .child("$folder/${fireBaseAuthentication.userCurrent.email.replaceAll('@', '_').replaceAll('.', "_")}/${getFileName(imagePath)}");
     var task = firebaseStorage.putFile(File(imagePath));
     await task.then((value) {
       //Success
       onSuccess(value.ref.fullPath);
-      print(value);
+      print("Uploaded Image File");
     }).catchError((err){
       print(err.toString());
     });
   }
 
+  Future<String> getImageLink(String path) async{
+    return await FirebaseStorage.instance
+        .ref(path)
+        .getDownloadURL();
+  }
 
   getFileName(String path) {
     return path = image.path.split('/').last;

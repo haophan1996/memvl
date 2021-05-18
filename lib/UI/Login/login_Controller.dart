@@ -35,6 +35,7 @@ class LoginController extends GetxController {
     UI_Helper().setLoading();
     if (FirebaseAuth.instance.currentUser != null) {
       fireBaseAuthentication.setData(() {
+        fireBaseAuthentication.listenPostCountUser(); // Listen user post
         Get.back();
         signInUser();
       });

@@ -37,7 +37,7 @@ class RegisterController extends GetxController {
   }
 
   void uploadImage() {
-    fireBaseUploadImage.uploadImage(imagePath.value, (path) async {
+    fireBaseUploadImage.uploadImage("ProfileUser",imagePath.value, (path) async {
       //onSuccess
       _firebaseAuth.currentUser
           .updateProfile(photoURL: path)

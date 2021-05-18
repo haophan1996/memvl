@@ -33,7 +33,9 @@ class ProfileController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     myPro.add(null);
-    userEmail = fireBaseAuthentication.userCurrent.email.replaceAll('@', '_').replaceAll('.', "_");
+    userEmail = fireBaseAuthentication.userCurrent.email
+        .replaceAll('@', '_')
+        .replaceAll('.', "_");
 
     await loadTotalIndex((value) {
       totalPost = value; // 3
@@ -57,7 +59,8 @@ class ProfileController extends GetxController {
     });
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         // if (lastIndex != firstIndex){
         //   isLoading.value = true;
         //loadMore();
@@ -69,8 +72,7 @@ class ProfileController extends GetxController {
   Future<void> loadTotalIndex(Function(int) onSuccess) async {
     _firebaseDatabase
         .reference()
-        .child("userCountPost/$userEmail")
-        .orderByChild("count")
+        .child("userCountPost/${userEmail}/count")
         .once()
         .then((DataSnapshot dataSnapshot) async {
       onSuccess(dataSnapshot.value['count']);
@@ -105,14 +107,12 @@ class ProfileController extends GetxController {
           .child("PostID/$element")
           .once()
           .then((DataSnapshot dataSnap) async {
-
-
-        await getPathPhotoUser(dataSnap.value['UserID'].toString(),(vals) async {
+        await getPathPhotoUser(dataSnap.value['UserID'].toString(),
+            (vals) async {
           await getLinkImage(vals, (val) async {
             imageProfile = val;
           });
         });
-
 
         if (dataSnap.value['Type'].toString() == "Image") {
           await getLinkImage(dataSnap.value['Image'].toString(), (val) {
@@ -138,8 +138,11 @@ class ProfileController extends GetxController {
     }
   }
 
-  getPathPhotoUser(String userID,Function(String) onPathPhotoURL) async {
-    await _firebaseStorage.ref("ProfileUser/$userID/").listAll().then((value) async {
+  getPathPhotoUser(String userID, Function(String) onPathPhotoURL) async {
+    await _firebaseStorage
+        .ref("ProfileUser/$userID/")
+        .listAll()
+        .then((value) async {
       await onPathPhotoURL(value.items.first.fullPath);
     });
   }
@@ -155,9 +158,11 @@ class ProfileController extends GetxController {
       if (value.length > 2) {
         UI_Helper().setLoading();
         imagePath.value = value;
-        fireBaseUploadImage.uploadImage(imagePath.value, (path) async {
+        fireBaseUploadImage.uploadImage("ProfileUser", imagePath.value,
+            (path) async {
           //onSuccess
-          if (fireBaseAuthentication.firebaseAuth.currentUser.photoURL != null) {
+          if (fireBaseAuthentication.firebaseAuth.currentUser.photoURL !=
+              null) {
             FirebaseStorage.instance
                 .ref(fireBaseAuthentication.firebaseAuth.currentUser.photoURL)
                 .delete()
