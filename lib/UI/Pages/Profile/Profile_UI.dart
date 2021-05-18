@@ -159,6 +159,7 @@ class ProfileUI extends GetView<ProfileController> {
   Widget userProfile(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 10,),
         SizedBox(
           height: 120,
           width: 120,

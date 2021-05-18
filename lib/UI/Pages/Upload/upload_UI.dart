@@ -18,7 +18,11 @@ class UploadUI extends GetView<UploadController> {
       gestures: [GestureType.onTap],
       child: Scaffold(
         resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          elevation: 0,
+          iconTheme: IconThemeData(color: Color(0xff3277D8)),
+          backgroundColor: Colors.white54,
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -26,13 +30,14 @@ class UploadUI extends GetView<UploadController> {
               },
               child: Text(
                 "Post",
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(color: Colors.black, fontSize: 20),
               ),
             ),
           ],
-          title: Text('Create Post'),
+          title: Text('Create Post', style: TextStyle(color: Colors.black),),
         ),
         body: Container(
+          color: Colors.white54,
           width: double.infinity,
           margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
           padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -48,18 +53,17 @@ class UploadUI extends GetView<UploadController> {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: FireBaseAuthentication.i.photoUrl.value ==
-                                  null
+                          image: FireBaseAuthentication.i.photoUrl.value == null
                               ? AssetImage("assets/signup_banner.png")
                               : FireBaseAuthentication.i.photoLink
                                           .toString()
                                           .length <
                                       5
-                                  ? Image.file(File(FireBaseAuthentication.i
-                                          .photoUrl
-                                          .value))
+                                  ? Image.file(File(FireBaseAuthentication
+                                          .i.photoUrl.value))
                                       .image
-                                  : CachedNetworkImageProvider(FireBaseAuthentication.i.photoLink),
+                                  : CachedNetworkImageProvider(
+                                      FireBaseAuthentication.i.photoLink),
                           fit: BoxFit.cover,
                         )),
                   ),
@@ -77,7 +81,7 @@ class UploadUI extends GetView<UploadController> {
                 ],
               ),
               Padding(
-                padding: EdgeInsets.only(bottom: 50),
+                padding: EdgeInsets.only(bottom: 50, top: 10),
                 child: Container(
                   width: double.infinity,
                   height: 100.0,
@@ -102,91 +106,97 @@ class UploadUI extends GetView<UploadController> {
                         : youtubePost())),
                 //Obx(() => (controller.path.value.length < 5 ? youtubePost() : imagePost())),
               ),
-              Container(
-                height: 50,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: Colors.black,
-                    ),
-                    shape: BoxShape.rectangle),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      " Add to your post",
-                      style: TextStyle(
-                          fontSize: 17,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Spacer(),
-                    IconButton(
-                        icon: Icon(Icons.image),
-                        onPressed: () {
-                          controller.getImage();
-                        }),
-                    IconButton(
-                        icon: Icon(Icons.video_collection),
-                        onPressed: () async {
-                          if (controller.isValidInputYoutube.value == true) {
-                            controller.isValidInputYoutube.value = false;
-                            controller.inputYoutube.text = "";
-                          }
-                          Get.defaultDialog(
-                            title: "Status",
-                            content: Column(
-                              children: [
-                                Obx(
-                                  () => TextField(
-                                    controller: controller.inputYoutube,
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.black),
-                                    decoration: InputDecoration(
-                                      errorText:
-                                          controller.isValidInputYoutube.value
-                                              ? "Invalid Link"
-                                              : null,
-                                      labelText: "Youtube Link",
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Color(0xffCED0D2), width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(6)),
+              Padding(
+                padding: EdgeInsets.fromLTRB(5, 0, 5, 20),
+                child: Container(
+                  height: 50,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: Colors.black,
+                      ),
+                      shape: BoxShape.rectangle),
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        " Add to your post",
+                        style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () {
+                            controller.getImage();
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.video_collection),
+                          onPressed: () async {
+                            if (controller.isValidInputYoutube.value == true) {
+                              controller.isValidInputYoutube.value = false;
+                              controller.inputYoutube.text = "";
+                            }
+                            Get.defaultDialog(
+                              title: "Status",
+                              content: Column(
+                                children: [
+                                  Obx(
+                                    () => TextField(
+                                      controller: controller.inputYoutube,
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.black),
+                                      decoration: InputDecoration(
+                                        errorText:
+                                            controller.isValidInputYoutube.value
+                                                ? "Invalid Link"
+                                                : null,
+                                        labelText: "Youtube Link",
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Color(0xffCED0D2),
+                                              width: 1),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(6)),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Row(
-                                  children: [
-                                    TextButton(
-                                        onPressed: () async {
-                                          if (await controller.checkInputYoutube() ==
-                                              true) {
-                                            controller.type.value = 2;
-                                            controller.path.value = "";
+                                  Row(
+                                    children: [
+                                      TextButton(
+                                          onPressed: () async {
+                                            if (await controller
+                                                    .checkInputYoutube() ==
+                                                true) {
+                                              controller.type.value = 2;
+                                              controller.path.value = "";
+                                              Get.back();
+                                            }
+                                          },
+                                          child: Text("Ok")),
+                                      Spacer(),
+                                      TextButton(
+                                          onPressed: () {
+                                            if (controller.isValidInputYoutube
+                                                    .value ==
+                                                true) {
+                                              controller.inputYoutube.text = "";
+                                            }
                                             Get.back();
-                                          }
-                                        },
-                                        child: Text("Ok")),
-                                    Spacer(),
-                                    TextButton(
-                                        onPressed: () {
-                                          if (controller
-                                                  .isValidInputYoutube.value ==
-                                              true) {
-                                            controller.inputYoutube.text = "";
-                                          }
-                                          Get.back();
-                                        },
-                                        child: Text("Cancel")),
-                                  ],
-                                )
-                              ],
-                            ),
-                          );
-                        }),
-                  ],
+                                          },
+                                          child: Text("Cancel")),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            );
+                          }),
+                    ],
+                  ),
                 ),
               ),
             ],
