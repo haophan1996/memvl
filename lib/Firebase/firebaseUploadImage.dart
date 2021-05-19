@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
-import 'firebaseAuth.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'firebaseAuth.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FireBaseUploadImage extends GetxController {
@@ -24,7 +24,7 @@ class FireBaseUploadImage extends GetxController {
     print("uploadImage:  $imagePath");
     var firebaseStorage = FirebaseStorage.instance
         .ref()
-        .child("$folder/${fireBaseAuthentication.userCurrent.email.replaceAll('@', '_').replaceAll('.', "_")}/${getFileName(imagePath)}");
+        .child("$folder/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/${getFileName(imagePath)}");
     var task = firebaseStorage.putFile(File(imagePath));
     await task.then((value) {
       //Success

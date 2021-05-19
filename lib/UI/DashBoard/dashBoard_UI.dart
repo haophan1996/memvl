@@ -32,7 +32,7 @@ class DashBoardUI extends GetView<DashBoardController> {
                         icon: Icon(Icons.home),
                         label: 'Home'),
                     BottomNavigationBarItem(
-                        icon: Icon(Icons.home),
+                        icon: Icon(Icons.assignment_ind_rounded),
                         label: 'Profile'),
                   ],
                   currentIndex: controller.selectedIndex.value,

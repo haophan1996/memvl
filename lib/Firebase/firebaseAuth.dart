@@ -11,26 +11,28 @@ class FireBaseAuthentication extends GetxController {
   RxString phone = "".obs;
   RxString email = "".obs;
   RxString photoUrl = "".obs;
-  RxInt postCount = 0.obs;
+  RxInt userPostCount = 0.obs;
+  RxInt globalPostCount = 0.obs;
   var photoLink;
   User userCurrent;
+  int userSign = 0; // 0 update, 1 delete
+  int globalSign = 0; // 0 update, 1 delete
 
-  setData(Function onSuccess) {
+  setData() {
     userCurrent = firebaseAuth.currentUser;
-    final dbRef = firebaseDatabase.reference().child("users").child(userCurrent.uid);
+    final dbRef =
+        firebaseDatabase.reference().child("users").child(userCurrent.uid);
     dbRef.once().then((DataSnapshot result) async {
       name = (result.value['name']).toString().obs;
       phone = (result.value['phone']).toString().obs;
       email = (userCurrent.email).obs;
       photoUrl = (userCurrent.photoURL).obs;
       if (photoUrl.value?.isNotEmpty == true) {
-         await FirebaseStorage.instance
+        await FirebaseStorage.instance
             .ref(photoUrl.value.toString())
             .getDownloadURL()
             .then((value) {
-           print(value);
           photoLink = value;
-          onSuccess();
         }).catchError((onError) {
           print("Set data: $onError");
         });
@@ -38,31 +40,56 @@ class FireBaseAuthentication extends GetxController {
     });
   }
 
-  listenPostCountUser()  {
-    firebaseDatabase
-        .reference()
-        .child(
-        "userCountPost/${getEmail()}/count/count/")
+  listenPostCountUser() {
+    firebaseDatabase.reference().child(
+        "userCountPost/${getEmail(firebaseAuth.currentUser.email)}/count/count/")
       ..onValue.listen((event) {
-        print("Post Count User: ${event.snapshot.value}");
-        postCount.value = event.snapshot.value;
+        if (event.snapshot.value == null)
+          userPostCount.value = 0;
+        else {
+          if (event.snapshot.value >= userPostCount.value) {
+            userSign = 0;
+          } else
+            userSign = 1;
+          print("Post Count User: ${event.snapshot.value}");
+          print(userSign == 0 ? "update $userSign" : "delete $userSign");
+          print(event.snapshot.value);
+          print(userPostCount.value);
+          userPostCount.value = event.snapshot.value;
+        }
+      });
+
+    firebaseDatabase.reference().child("globalPostCount/count/")
+      ..onValue.listen((event) {
+        if (event.snapshot.value == null) globalPostCount.value = 0;
+        else {
+          if (event.snapshot.value >= globalPostCount.value) {
+            globalSign = 0;
+          } else
+            globalSign = 1;
+          print("Post Count Global: ${event.snapshot.value}");
+          print(globalSign == 0 ? "update $globalSign" : "delete $globalSign");
+          print(event.snapshot.value);
+          print(globalPostCount.value);
+          globalPostCount.value = event.snapshot.value;
+        }
       });
   }
 
-  Future<void> signIn(
-      String email, String password, Function onSuccess, Function(String) onSignInError) async {
-    await firebaseAuth.signInWithEmailAndPassword(email: email, password: password).then((user) {
-      setData(() {
-        print("loaded link profile");
-      });
+  Future<void> signIn(String email, String password, Function onSuccess,
+      Function(String) onSignInError) async {
+    await firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((user) {
+      setData();
       onSuccess();
     }).catchError((err) {
       onSignInError(err.code);
     });
   }
 
-  Future<void> signUp(String email, String password, String name, String phone, Function onSuccess,
-      Function(String) onRegisterError) async {
+  Future<void> signUp(String email, String password, String name, String phone,
+      Function onSuccess, Function(String) onRegisterError) async {
     await firebaseAuth
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((user) {
@@ -101,9 +128,7 @@ class FireBaseAuthentication extends GetxController {
     }
   }
 
-  String getEmail() {
-    return email
-        .replaceAll('@', '_')
-        .replaceAll('.', "_");
+  String getEmail(String email) {
+    return email.replaceAll('@', '_').replaceAll('.', "_");
   }
 }

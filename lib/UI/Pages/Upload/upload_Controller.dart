@@ -1,15 +1,13 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/Firebase/firebaseUploadImage.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
 
 class UploadController extends GetxController {
   //static UploadController get instance => Get.find<UploadController>();
@@ -26,6 +24,9 @@ class UploadController extends GetxController {
   var yt = YoutubeExplode();
   var currentIdPost = "";
   var timeStamps = "";
+
+  var imagePathFirebase = "";
+  var imageLinkFirebase = "";
 
   @override
   void dispose() {
@@ -47,41 +48,63 @@ class UploadController extends GetxController {
     print(currentIdPost);
     print(timeStamps);
 
-    // //Add data to global post folder
-    // await _firebaseFirestore
-    //     .collection("memeVl/Posts/collection")
-    //     .doc(currentIdPost)
-    //     .set({
-    //   "Date": int.parse(timeStamps),
-    //   "Image": path.value,
-    //   "ImageLink" : "",
-    //   "PostID": currentIdPost,
-    //   "Status": textStatus.text,
-    //   "TitleYoutube": titleYoutube.value,
-    //   "Type": type.value,
-    //   "UserID": getEmail(),
-    //   "Video": idYoutube.value
-    // });
-    //
-    // //Add post id to owner
-    // await _firebaseFirestore.collection("memeVl/Users/${getEmail()}").doc().set({
-    //   "Date": int.parse(timeStamps),
-    //   "PostID": currentIdPost,
-    // });
+    if (type.value == 1) {
+      await uploadImage();
+      print("imagePathFirebase $imagePathFirebase");
+      imageLinkFirebase =
+          await fireBaseUploadImage.getImageLink(imagePathFirebase);
+    }
 
-    // //Increment total index post user
-    // FireBaseAuthentication.i.firebaseDatabase
-    //     .reference()
-    //     .child(
-    //     "userCountPost/haophan_gmail_com/count").update({
-    //   "count" : FireBaseAuthentication.i.postCount.value+=1
-    // });
-  }
+    //Add data to global post folder
+    await _firebaseFirestore
+        .collection("memeVl/Posts/collection")
+        .doc(currentIdPost)
+        .set({
+      "Date": int.parse(timeStamps),
+      "Image": imagePathFirebase,
+      "ImageLink": imageLinkFirebase,
+      "PostID": currentIdPost,
+      "Status": textStatus.text,
+      "TitleYoutube": titleYoutube.value,
+      "Type": type.value,
+      "UserID": getEmail(),
+      "Video": idYoutube.value
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    });
 
-  getRemoveMedia() {
-    path.value = "";
-    inputYoutube.text = "";
-    type.value = 0;
+    //Add post id to owner
+    await _firebaseFirestore
+        .collection("memeVl/Users/${getEmail()}")
+        .doc()
+        .set({
+      "Date": int.parse(timeStamps),
+      "PostID": currentIdPost,
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    });
+
+    //Increment total index global
+    await FireBaseAuthentication.i.firebaseDatabase
+        .reference()
+        .child("globalPostCount/")
+        .update({
+      "count": FireBaseAuthentication.i.globalPostCount.value +1
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    });
+
+    //Increment total index user
+    await FireBaseAuthentication.i.firebaseDatabase
+        .reference()
+        .child("userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
+        .update({
+      "count": FireBaseAuthentication.i.userPostCount.value + 1
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    }).then((value) {
+      UI_Helper().setDialogMessage("Success", true);
+    });
   }
 
   getImage() {
@@ -91,19 +114,17 @@ class UploadController extends GetxController {
         path.value = value;
         type.value = 1;
         inputYoutube.text = "";
-
-        await uploadImage();
       }
       print("selected image Status: $value");
     });
   }
 
-  uploadImage() async{
-    await fireBaseUploadImage.uploadImage("UserPostImage/${getEmail()}", path.value, (val) async {
-      await fireBaseUploadImage.getImageLink(val).then((value) { print(value);});
+  uploadImage() async {
+    await fireBaseUploadImage
+        .uploadImage("UserPostImage/${getEmail()}", path.value, (val) async {
+      imagePathFirebase = val;
     });
   }
-
 
   checkInputYoutube() async {
     YoutubePlayer.convertUrlToId(inputYoutube.text) == null
@@ -128,20 +149,22 @@ class UploadController extends GetxController {
     return isValidInputYoutube.value == false ? true : false;
   }
 
+  getRemoveMedia() {
+    path.value = "";
+    inputYoutube.text = "";
+    type.value = 0;
+  }
+
   String generateTime() {
-    return DateTime
-        .now()
-        .toUtc()
-        .millisecondsSinceEpoch
-        .toString();
+    return DateTime.now().toUtc().millisecondsSinceEpoch.toString();
   }
 
   String getEmail() {
-    return FireBaseAuthentication.i.getEmail();
+    return FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email);
   }
 
   setID() {
     timeStamps = generateTime();
-    currentIdPost = FireBaseAuthentication.i.userCurrent.uid + timeStamps;
+    currentIdPost = FireBaseAuthentication.i.firebaseAuth.currentUser.uid + timeStamps;
   }
 }

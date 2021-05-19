@@ -10,8 +10,8 @@ import 'login_Controller.dart';
 class LoginUI extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      home: KeyboardDismisser(
+    return Scaffold(
+      body: KeyboardDismisser(
         gestures: [GestureType.onTap],
         child: Scaffold(
           body: Container(

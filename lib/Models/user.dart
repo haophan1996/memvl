@@ -1,16 +1,16 @@
 
 class ProfileModel {
-  final String UserID ;
-  final String VideoTitle;
-  final String Video;
-  final String Text;
-  final String Title;
-  final String Type;
-  final String Image;
-  final String Date;
-  final String PostID;
-  final String userPhoto;
+   final int date;
+   final String imagePath;
+   final String imageLink;
+   final String postId;
+   final String status;
+   final String titleYoutube;
+   final int type;
+   final String userId;
+   final String video;
 
-  ProfileModel(this.UserID, this.VideoTitle, this.Video,this.Text, this.Title, this.Type, this.Image, this.Date, this.PostID, this.userPhoto);
+  ProfileModel(this.date, this.imagePath, this.imageLink, this.postId, this.status, this.titleYoutube, this.type, this.userId, this.video);
+
 
 }

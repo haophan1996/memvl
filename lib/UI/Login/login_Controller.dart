@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_Binding.dart';
 import 'package:mem_vl/UI/DashBoard/dashBoard_UI.dart';
-import 'package:mem_vl/UI/Pages/Home/HomePage_Binding.dart';
-import 'package:mem_vl/UI/Pages/Profile/Profile_Binding.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
 
 class LoginController extends GetxController {
@@ -17,30 +14,17 @@ class LoginController extends GetxController {
   RxBool isHidden = true.obs;
   RxBool isEmailValid = false.obs;
   RxBool isPasswordValid = false.obs;
-
   final controller_email = TextEditingController();
   final controller_pass = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
-    print("check");
   }
 
   @override
   Future<void> onReady() {
     super.onReady();
-    ProfileBinding().dependencies();
-    HomePageBinding().dependencies();
-    UI_Helper().setLoading();
-    if (FirebaseAuth.instance.currentUser != null) {
-      fireBaseAuthentication.setData(() {
-        fireBaseAuthentication.listenPostCountUser(); // Listen user post
-        Get.back();
-        signInUser();
-      });
-    } else
-      Get.back();
   }
 
   void togglePassword() {
@@ -54,8 +38,14 @@ class LoginController extends GetxController {
   void signIn() {
     fireBaseAuthentication.signIn(controller_email.text, controller_pass.text, () {
       //On success
-      Get.back();
-      signInUser();
+      fireBaseAuthentication.listenPostCountUser();
+      fireBaseAuthentication.userPostCount.stream.listen((event) {
+        if (event != null){
+          Get.back();
+          signInUser();
+        }
+      });
+
     }, (msg) {
       //On fail
       UI_Helper().setDialogMessage(msg, false);

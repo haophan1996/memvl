@@ -4,20 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 
 class ProfileUI extends GetView<ProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-            () => ListView.builder(
-            //physics: ClampingScrollPhysics(),
+        () => ListView.builder(
             controller: controller.scrollController,
             itemCount: controller.myPro.length + 1,
             itemBuilder: (BuildContext context, int index) {
               if (index == controller.myPro.length) {
-                return (controller.totalPost+1) != (controller.myPro.length)
+                return (controller.totalPost + 1) != (controller.myPro.length)
                     ? CupertinoActivityIndicator()
                     : Container();
               }
@@ -31,7 +30,7 @@ class ProfileUI extends GetView<ProfileController> {
   }
 
   getContentSubList(int index) {
-    if (controller.myPro.elementAt(index).Type == "Image") {
+    if (controller.myPro.elementAt(index).type == 1) {
       return Container(
         height: 250,
         width: double.infinity,
@@ -40,19 +39,20 @@ class ProfileUI extends GetView<ProfileController> {
             boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
             borderRadius: BorderRadius.all(Radius.circular(5)),
             image: DecorationImage(
-              image: CachedNetworkImageProvider(controller.myPro.elementAt(index).Image),
+              image: CachedNetworkImageProvider(
+                  controller.myPro.elementAt(index).imageLink),
               fit: BoxFit.contain,
             )),
       );
-    } else if (controller.myPro.elementAt(index).Type == "Text") {
-      return Text(controller.myPro.elementAt(index).Text,
+    } else if (controller.myPro.elementAt(index).type == 0) {
+      return Text(controller.myPro.elementAt(index).status,
           style: TextStyle(
             fontSize: 15,
             color: Color(0xFFF101113),
             height: 1.4,
             letterSpacing: 1.4,
           ));
-    } else if (controller.myPro.elementAt(index).Type == "Video") {
+    } else if (controller.myPro.elementAt(index).type == 2) {
       return Column(
         children: <Widget>[
           Container(
@@ -60,11 +60,14 @@ class ProfileUI extends GetView<ProfileController> {
             width: double.infinity,
             decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+                boxShadow: [
+                  BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
+                ],
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 image: DecorationImage(
                   // YoutubePlayer.convertUrlToId(controller.myPro.elementAt(index).Video)
-                  image: CachedNetworkImageProvider("https://img.youtube.com/vi/${YoutubePlayer.convertUrlToId(controller.myPro.elementAt(index).Video)}/0.jpg" ),
+                  image: CachedNetworkImageProvider(
+                      "https://img.youtube.com/vi/${controller.myPro.elementAt(index).video}/0.jpg"),
                   fit: BoxFit.contain,
                 )),
           ),
@@ -72,10 +75,12 @@ class ProfileUI extends GetView<ProfileController> {
           Container(
             decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
+                boxShadow: [
+                  BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
+                ],
                 borderRadius: BorderRadius.all(Radius.circular(5))),
             child: Text(
-              controller.myPro.elementAt(index).VideoTitle,
+              controller.myPro.elementAt(index).titleYoutube,
               style: TextStyle(
                 fontSize: 15,
                 color: Color(0xFFF101113),
@@ -89,11 +94,12 @@ class ProfileUI extends GetView<ProfileController> {
     }
   }
 
-  Widget userList(BuildContext context, ProfileController controller, int index) {
+  Widget userList(
+      BuildContext context, ProfileController controller, int index) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius:
-            BorderRadius.only(topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
         color: Colors.black12,
       ),
       width: double.infinity,
@@ -104,38 +110,46 @@ class ProfileUI extends GetView<ProfileController> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Obx(()=> Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image:controller.fireBaseAuthentication.photoUrl.value == null
-                          ? AssetImage("assets/signup_banner.png")
-                          : controller.fireBaseAuthentication.photoLink.toString().length < 5
-                          ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
-                          .image
-                          : CachedNetworkImageProvider(
-                          controller.fireBaseAuthentication.photoLink),
-                      //controller.myPro.elementAt(index).userPhoto.length > 6
-                      //     ? CachedNetworkImageProvider(controller.myPro.elementAt(index).userPhoto)
-                      //     : AssetImage('assets/signup_banner.png'),
-                      fit: BoxFit.cover,
-                    )),
-              ),),
+              Obx(
+                () => Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: controller
+                                    .fireBaseAuthentication.photoUrl.value ==
+                                null
+                            ? AssetImage("assets/signup_banner.png")
+                            : controller.fireBaseAuthentication.photoLink
+                                        .toString()
+                                        .length <
+                                    5
+                                ? Image.file(File(controller
+                                        .fireBaseAuthentication.photoUrl.value))
+                                    .image
+                                : CachedNetworkImageProvider(controller
+                                    .fireBaseAuthentication.photoLink),
+                        fit: BoxFit.cover,
+                      )),
+                ),
+              ),
               SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(controller.myPro.elementAt(index).Title,
+                  Text(controller.myPro.elementAt(index).status,
                       style: TextStyle(
-                          color: Color(0xFFF101113), fontSize: 19, fontWeight: FontWeight.bold)),
+                          color: Color(0xFFF101113),
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold)),
                   SizedBox(width: 3),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(controller.myPro.elementAt(index).Date,
-                          style: TextStyle(fontSize: 15, color: Color(0xFFF101113))),
+                      Text(controller.myPro.elementAt(index).date.toString(),
+                          style: TextStyle(
+                              fontSize: 15, color: Color(0xFFF101113))),
                       SizedBox(width: 3),
                       Icon(Icons.history, color: Color(0xFFF101113), size: 18)
                     ],
@@ -144,8 +158,11 @@ class ProfileUI extends GetView<ProfileController> {
               ),
               Spacer(),
               IconButton(
-                icon: Icon(Icons.more_horiz, color: Color(0xFFF101113), size: 30),
-                onPressed: () {},
+                icon:
+                    Icon(Icons.more_horiz, color: Color(0xFFF101113), size: 30),
+                onPressed: () {
+                  showOptions(context, index);
+                },
               ),
             ],
           ),
@@ -159,7 +176,9 @@ class ProfileUI extends GetView<ProfileController> {
   Widget userProfile(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 10,),
+        SizedBox(
+          height: 10,
+        ),
         SizedBox(
           height: 120,
           width: 120,
@@ -174,7 +193,8 @@ class ProfileUI extends GetView<ProfileController> {
                 color: Colors.white,
                 onPressed: () async {
                   controller.getUploadImage();
-                }, child: null,
+                },
+                child: null,
               ),
               InkWell(
                 onTap: () async {
@@ -182,10 +202,16 @@ class ProfileUI extends GetView<ProfileController> {
                 },
                 child: Obx(
                   () => CircleAvatar(
-                    backgroundImage: controller.fireBaseAuthentication.photoUrl.value == null
+                    backgroundImage: controller
+                                .fireBaseAuthentication.photoUrl.value ==
+                            null
                         ? AssetImage("assets/signup_banner.png")
-                        : controller.fireBaseAuthentication.photoLink.toString().length < 5
-                            ? Image.file(File(controller.fireBaseAuthentication.photoUrl.value))
+                        : controller.fireBaseAuthentication.photoLink
+                                    .toString()
+                                    .length <
+                                5
+                            ? Image.file(File(controller
+                                    .fireBaseAuthentication.photoUrl.value))
                                 .image
                             : CachedNetworkImageProvider(
                                 controller.fireBaseAuthentication.photoLink),
@@ -246,5 +272,30 @@ class ProfileUI extends GetView<ProfileController> {
         SizedBox(height: 10)
       ],
     );
+  }
+
+  void showOptions(BuildContext context, int index) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            height: 80,
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                  title: Text("Delete"),
+                  onTap: () {
+                    UI_Helper().setLoading();
+                    controller.deleteDocument(index);
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 }

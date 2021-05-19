@@ -1,161 +1,155 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/Firebase/firebaseUploadImage.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mem_vl/Models/user.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileController extends GetxController {
-  static ProfileController get instance => Get.find<ProfileController>();
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
   final FireBaseUploadImage fireBaseUploadImage = Get.find();
-  FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  final Map<String, int> myMap = {};
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
-
-  List myl = List();
   List<ProfileModel> myPro = List<ProfileModel>().obs;
   var totalPost = 0;
-  var firstIndex = 0;
-  var lastIndex = 0;
   var scrollController = ScrollController();
   var imagePath = "".obs;
-  var yt = YoutubeExplode();
-  var userEmail;
+  var lastVisit;
+  var _limit;
+  bool stopUpdate = false;
 
   @override
   Future<void> onInit() async {
     super.onInit();
+    totalPost = fireBaseAuthentication.userPostCount.value;
     myPro.add(null);
-    userEmail = fireBaseAuthentication.userCurrent.email
-        .replaceAll('@', '_')
-        .replaceAll('.', "_");
+    totalPost < 5 ? _limit = totalPost : _limit = 5;
+    if (totalPost > 0) await loadUserPost(_limit);
 
-    await loadTotalIndex((value) {
-      totalPost = value; // 3
-      if (totalPost != 0) {
-        if (totalPost >= 5)
-          firstIndex = 5;
-        else if (totalPost < 5) {
-          firstIndex = totalPost;
-        }
-      }
-
-      _firebaseFirestore
-          .collection("memeVl/User/$userEmail/")
-          .limit(firstIndex)
-          .orderBy("Date", descending: true)
-          .get()
-          .then((querySnapshot) {
-        lastIndex = firstIndex;
-        show(querySnapshot);
-      });
-    });
-
-    scrollController.addListener(() {
+    scrollController.addListener(() async {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
-        // if (lastIndex != firstIndex){
-        //   isLoading.value = true;
-        //loadMore();
-        // }
+        if ((myPro.length - 1) != totalPost) {
+          if (stopUpdate == false) {
+            totalPost - (myPro.length - 1) < 5
+                ? _limit = totalPost
+                : _limit = 5;
+            await loadMore(_limit);
+          }
+        }
       }
     });
-  }
 
-  Future<void> loadTotalIndex(Function(int) onSuccess) async {
-    _firebaseDatabase
-        .reference()
-        .child("userCountPost/${userEmail}/count")
-        .once()
-        .then((DataSnapshot dataSnapshot) async {
-      onSuccess(dataSnapshot.value['count']);
+    fireBaseAuthentication.userPostCount.stream.listen((event) {
+      if (fireBaseAuthentication.userSign == 0) listenUserPost();
     });
   }
 
-  // loadMore() {
-  //   final ref = _firebaseDatabase
-  //       .reference()
-  //       .child("userPosr")
-  //       .child(userEmail)
-  //       .orderByChild("Date")
-  //       .limitToLast(1);
-  //   ref.once().then((DataSnapshot dataSnapshot) async {
-  //     values = await dataSnapshot.value;
-  //     isLoading.value = false;
-  //     show(values);
-  //   });
-  // }
-
-  show(QuerySnapshot<Map<String, dynamic>> element) async {
-    element.docs.forEach((element) {
-      myl.add(element['PostID']);
-    });
-
-    var image;
-    var imageProfile;
-    var title;
-    for (var element in myl) {
-      await _firebaseDatabase
-          .reference()
-          .child("PostID/$element")
-          .once()
-          .then((DataSnapshot dataSnap) async {
-        await getPathPhotoUser(dataSnap.value['UserID'].toString(),
-            (vals) async {
-          await getLinkImage(vals, (val) async {
-            imageProfile = val;
-          });
-        });
-
-        if (dataSnap.value['Type'].toString() == "Image") {
-          await getLinkImage(dataSnap.value['Image'].toString(), (val) {
-            image = val;
-          });
-        } else if (dataSnap.value['Type'].toString() == "Video") {
-          var get = await yt.videos.get(dataSnap.value['Video'].toString());
-          title = get.title;
-        }
-
-        myPro.add(ProfileModel(
-            dataSnap.value['UserID'].toString(),
-            await title,
-            dataSnap.value['Video'].toString(),
-            dataSnap.value['Text'].toString(),
-            dataSnap.value['Title'].toString(),
-            dataSnap.value['Type'].toString(),
-            await image,
-            dataSnap.value['Date'].toString(),
-            dataSnap.value['PostID'].toString(),
-            await imageProfile));
+  listenUserPost() async {
+    totalPost += 1; //Increase total to prevent loadMore
+    await _firebaseFirestore
+        .collection("memeVl/Posts/collection/")
+        .where("UserID",
+            isEqualTo: FireBaseAuthentication.i.getEmail(
+                FireBaseAuthentication.i.firebaseAuth.currentUser.email))
+        .orderBy("Date", descending: true)
+        .limit(1)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) async {
+        myPro.insert(1, myob(element));
       });
-    }
-  }
-
-  getPathPhotoUser(String userID, Function(String) onPathPhotoURL) async {
-    await _firebaseStorage
-        .ref("ProfileUser/$userID/")
-        .listAll()
-        .then((value) async {
-      await onPathPhotoURL(value.items.first.fullPath);
     });
   }
 
-  getLinkImage(String image, Function(String) onResultLinkImage) async {
-    await _firebaseStorage.ref(image).getDownloadURL().then((value) async {
-      await onResultLinkImage(value);
+  loadMore(int limit) async {
+    await _firebaseFirestore
+        .collection("memeVl/Posts/collection/")
+        .where("UserID",
+            isEqualTo: FireBaseAuthentication.i.getEmail(
+                FireBaseAuthentication.i.firebaseAuth.currentUser.email))
+        .orderBy("Date", descending: true)
+        .startAfterDocument(lastVisit)
+        .limit(limit)
+        .get()
+        .then((value) async {
+      value.docs.forEach((element) async {
+        myPro.add(myob(element));
+      });
+      lastVisit = value.docs[value.docs.length - 1];
+    });
+  }
+
+  loadUserPost(int limit) async {
+    await _firebaseFirestore
+        .collection("memeVl/Posts/collection/")
+        .where("UserID",
+            isEqualTo: FireBaseAuthentication.i.getEmail(
+                FireBaseAuthentication.i.firebaseAuth.currentUser.email))
+        .orderBy("Date", descending: true)
+        .limit(limit)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) async {
+        myPro.add(myob(element));
+      });
+      lastVisit = value.docs[value.docs.length - 1];
+    });
+  }
+
+  deleteDocument(int index) async {
+    stopUpdate = true;
+    //Delete post in Firebase
+    await _firebaseFirestore
+        .collection("memeVl/Posts/collection/")
+        .doc(myPro.elementAt(index).postId)
+        .delete()
+        .catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    });
+
+    //Set postID deleted to database
+    // await FireBaseAuthentication.i.firebaseDatabase
+    //         .reference()
+    //         .child("userCountPost/${fireBaseAuthentication.getEmail(fireBaseAuthentication.email.value)}/idDel/idDel/")
+    //         .update({
+    //       "count": FireBaseAuthentication.i.globalPostCount.value - 1
+    //     }).catchError((onError) {
+    //       UI_Helper().setDialogMessage(onError, false);
+    //     });
+
+    //Decrease index global
+    await FireBaseAuthentication.i.firebaseDatabase
+        .reference()
+        .child("globalPostCount/")
+        .update({
+      "count": FireBaseAuthentication.i.globalPostCount.value - 1
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
+    });
+
+    //Decrease index user
+    await FireBaseAuthentication.i.firebaseDatabase
+        .reference()
+        .child(
+            "userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
+        .update({
+      "count": FireBaseAuthentication.i.userPostCount.value - 1
+    }).then((value) {
+      totalPost -= 1;
+      stopUpdate = false;
+      myPro.removeAt(index);
+      UI_Helper().setDialogMessage("Deleted", true);
+    }).catchError((onError) {
+      UI_Helper().setDialogMessage(onError, false);
     });
   }
 
   getUploadImage() async {
     fireBaseUploadImage.getImage((value) {
-      if (value.length > 2) {
+      if (value != "none") {
         UI_Helper().setLoading();
         imagePath.value = value;
         fireBaseUploadImage.uploadImage("ProfileUser", imagePath.value,
@@ -185,9 +179,17 @@ class ProfileController extends GetxController {
     });
   }
 
-  getURLImageFirebase(String path) async {
-    final ref = FirebaseStorage.instance.ref(path);
-    var user = await ref.getDownloadURL();
-    NetworkImage(user);
+  Object myob(QueryDocumentSnapshot<Map<String, dynamic>> element) {
+    myMap[element['PostID']] = myPro.length+1;
+    return ProfileModel(
+        element['Date'],
+        element['Image'],
+        element['ImageLink'],
+        element['PostID'],
+        element['Status'],
+        element['TitleYoutube'],
+        element['Type'],
+        element['UserID'],
+        element['Video']);
   }
 }

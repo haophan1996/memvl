@@ -8,6 +8,7 @@ import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/UI/Pages/Upload/upload_Controller.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mem_vl/Util/UI_Helper.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class UploadUI extends GetView<UploadController> {
@@ -26,6 +27,7 @@ class UploadUI extends GetView<UploadController> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                UI_Helper().setLoading();
                 controller.processPost();
               },
               child: Text(
@@ -34,7 +36,10 @@ class UploadUI extends GetView<UploadController> {
               ),
             ),
           ],
-          title: Text('Create Post', style: TextStyle(color: Colors.black),),
+          title: Text(
+            'Create Post',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         body: Container(
           color: Colors.white54,
