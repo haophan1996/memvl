@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:mem_vl/Firebase/firebaseAuth.dart';
 import 'package:mem_vl/Firebase/firebaseUploadImage.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mem_vl/Util/Youtube.dart';
+
 
 class UploadController extends GetxController {
   //static UploadController get instance => Get.find<UploadController>();
@@ -21,7 +22,6 @@ class UploadController extends GetxController {
   var textStatus = TextEditingController();
   var titleYoutube = "".obs;
   var idYoutube = "".obs;
-  var yt = YoutubeExplode();
   var currentIdPost = "";
   var timeStamps = "";
 
@@ -30,7 +30,6 @@ class UploadController extends GetxController {
 
   @override
   void dispose() {
-    yt.close();
     path.close();
     type.close();
     idYoutube.close();
@@ -89,7 +88,7 @@ class UploadController extends GetxController {
         .reference()
         .child("globalPostCount/")
         .update({
-      "count": FireBaseAuthentication.i.globalPostCount.value +1
+      "count": FireBaseAuthentication.i.globalPostCount.value + 1
     }).catchError((onError) {
       UI_Helper().setDialogMessage(onError, false);
     });
@@ -97,7 +96,8 @@ class UploadController extends GetxController {
     //Increment total index user
     await FireBaseAuthentication.i.firebaseDatabase
         .reference()
-        .child("userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
+        .child(
+            "userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
         .update({
       "count": FireBaseAuthentication.i.userPostCount.value + 1
     }).catchError((onError) {
@@ -120,8 +120,8 @@ class UploadController extends GetxController {
   }
 
   uploadImage() async {
-    await fireBaseUploadImage
-        .uploadImage("UserPostImage/${getEmail()}", path.value, (val) async {
+    await fireBaseUploadImage.uploadImage("UserPostImage", path.value,
+        (val) async {
       imagePathFirebase = val;
     });
   }
@@ -133,21 +133,12 @@ class UploadController extends GetxController {
 
     if (!isValidInputYoutube.value) {
       // valid
-      if (idYoutube.isEmpty) {
-        idYoutube.value = YoutubePlayer.convertUrlToId(inputYoutube.text);
-        var get = await yt.videos.get(idYoutube.value);
-        titleYoutube.value = get.title;
-      } else {
-        if (idYoutube.value !=
-            YoutubePlayer.convertUrlToId(inputYoutube.text)) {
-          idYoutube.value = YoutubePlayer.convertUrlToId(inputYoutube.text);
-          var get = await yt.videos.get(idYoutube.value);
-          titleYoutube.value = get.title;
-        }
-      }
+      idYoutube.value = YoutubePlayer.convertUrlToId(inputYoutube.text);
+      titleYoutube.value = await getTitleYoutube(idYoutube.value);
     }
     return isValidInputYoutube.value == false ? true : false;
   }
+
 
   getRemoveMedia() {
     path.value = "";
@@ -160,11 +151,13 @@ class UploadController extends GetxController {
   }
 
   String getEmail() {
-    return FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email);
+    return FireBaseAuthentication.i
+        .getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email);
   }
 
   setID() {
     timeStamps = generateTime();
-    currentIdPost = FireBaseAuthentication.i.firebaseAuth.currentUser.uid + timeStamps;
+    currentIdPost =
+        FireBaseAuthentication.i.firebaseAuth.currentUser.uid + timeStamps;
   }
 }

@@ -28,18 +28,27 @@ class LoginUI extends GetView<LoginController> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 40, 0, 6),
                     child: Text("Wassup mate!",
-                        style: TextStyle(fontSize: 22, color: Color(0xff333333))),
+                        style:
+                            TextStyle(fontSize: 22, color: Color(0xff333333))),
                   ),
-                  Text("Login", style: TextStyle(fontSize: 16, color: Color(0xff606470))),
-                  Obx(() => UI_Helper().createTextField(controller.controller_email, 0, 50, 0, 10,
-                      "Email", "ic_email.png", controller.isEmailValid.value)),
+                  Text("Login",
+                      style: TextStyle(fontSize: 16, color: Color(0xff606470))),
+                  Obx(() => UI_Helper().createTextField(
+                      controller.controller_email,
+                      0,
+                      50,
+                      0,
+                      10,
+                      "Email",
+                      "ic_email.png",
+                      controller.isEmailValid.value)),
                   Obx(
                     () => UI_Helper().createTextFieldPassword(
                         controller.controller_pass,
                         0,
                         0,
                         0,
-                        20,
+                        0,
                         "Password",
                         "ic_password.png",
                         controller.isHidden.value,
@@ -47,15 +56,28 @@ class LoginUI extends GetView<LoginController> {
                       controller.togglePassword();
                     }),
                   ),
+                  Obx(() => CheckboxListTile(
+                      activeColor: Colors.redAccent,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text("Remember my account"),
+                      value: controller.isCheckBoxRemember.value,
+                      onChanged: (value) {
+                        value == true
+                            ? controller.isCheckBoxRemember.value = true
+                            : controller.isCheckBoxRemember.value = false;
+                        controller.rememberAccount();
+                      })),
                   Container(
-                    constraints: BoxConstraints.loose(Size(double.infinity, 30)),
+                    constraints:
+                        BoxConstraints.loose(Size(double.infinity, 30)),
                     alignment: AlignmentDirectional.centerEnd,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                       child: RichText(
                         text: TextSpan(
                           text: "Forgot password",
-                          style: TextStyle(fontSize: 16, color: Color(0xff606470)),
+                          style:
+                              TextStyle(fontSize: 16, color: Color(0xff606470)),
                         ),
                       ),
                     ),
@@ -72,7 +94,9 @@ class LoginUI extends GetView<LoginController> {
                             controller.signIn();
                           }
                         },
-                        child: Text("Log In", style: TextStyle(fontSize: 18, color: Colors.white)),
+                        child: Text("Log In",
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.white)),
                         color: Color(0xff4fad6e),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -85,12 +109,14 @@ class LoginUI extends GetView<LoginController> {
                     child: RichText(
                       text: TextSpan(
                         text: "New user? ",
-                        style: TextStyle(fontSize: 16, color: Color(0xff606470)),
+                        style:
+                            TextStyle(fontSize: 16, color: Color(0xff606470)),
                         children: <TextSpan>[
                           TextSpan(
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                Get.to(() => RegisterUI(), binding: RegisterBinding());
+                                Get.to(() => RegisterUI(),
+                                    binding: RegisterBinding());
                               },
                             text: "Sign up new account",
                             style: TextStyle(

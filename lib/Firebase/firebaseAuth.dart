@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 class FireBaseAuthentication extends GetxController {
   static FireBaseAuthentication get i => Get.find();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   FirebaseDatabase firebaseDatabase = FirebaseDatabase.instance;
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   RxString name = "".obs;
   RxString phone = "".obs;
   RxString email = "".obs;
@@ -40,7 +42,14 @@ class FireBaseAuthentication extends GetxController {
     });
   }
 
+
   listenPostCountUser() {
+    firebaseFirestore.collection("memeVl/Posts/collection").snapshots().listen((event) {
+          event.docChanges.forEach((element) {
+            print(element.doc['PostID']);
+          });
+    });
+    
     firebaseDatabase.reference().child(
         "userCountPost/${getEmail(firebaseAuth.currentUser.email)}/count/count/")
       ..onValue.listen((event) {
@@ -74,6 +83,13 @@ class FireBaseAuthentication extends GetxController {
           globalPostCount.value = event.snapshot.value;
         }
       });
+  }
+
+
+  Future<void> signOut(Function onSuccess) async{
+    await firebaseAuth.signOut().then((value) {
+      onSuccess();
+    });
   }
 
   Future<void> signIn(String email, String password, Function onSuccess,

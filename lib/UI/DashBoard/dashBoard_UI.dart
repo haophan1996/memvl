@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mem_vl/Firebase/firebaseAuth.dart';
+import 'package:mem_vl/Firebase/firebaseUploadImage.dart';
+import 'package:mem_vl/UI/Login/login_UI.dart';
+import 'package:mem_vl/UI/Login/login_binding.dart';
+import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 import 'dashBoard_Controller.dart';
-import 'package:mem_vl/UI/Pages/Upload/upload_UI.dart';
-import 'package:mem_vl/UI/Pages/Upload/upload_Binding.dart';
 
 class DashBoardUI extends GetView<DashBoardController> {
   @override
@@ -11,19 +14,29 @@ class DashBoardUI extends GetView<DashBoardController> {
         builder: (controller) {
           return Scaffold(
             appBar: AppBar(
-              title: Text('Meme VL'),),
+              title: Text('Meme VL'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    FireBaseAuthentication.i.signOut((){
+                      Get.offAll(()=> LoginUI(), binding: LoginBinding());
+                      FireBaseAuthentication.i.firebaseFirestore.terminate();
+                      FireBaseAuthentication.i.firebaseDatabase.reactive.dispose();
+                      Get.reset();
+                      Get.put<FireBaseAuthentication>(FireBaseAuthentication());
+                      Get.put<FireBaseUploadImage>(FireBaseUploadImage());
+                    });
+                  },
+                  child: Text(
+                    "Sign out",
+                    style: TextStyle(color: Colors.white, fontSize: 17),
+                  ),
+                ),
+              ],
+            ),
             body: Obx(() => Center(
               child: controller.widgetOption.elementAt(controller.selectedIndex.value),
             )),
-
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: (){
-                Get.to(()=> UploadUI(), binding: UploadBinding());
-              },
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
-
             bottomNavigationBar: Obx(() =>
                 BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
@@ -39,7 +52,6 @@ class DashBoardUI extends GetView<DashBoardController> {
                   onTap: (index) => controller.selectedIndex.value = index,
                 ),
             ),
-
           );
         }
     );

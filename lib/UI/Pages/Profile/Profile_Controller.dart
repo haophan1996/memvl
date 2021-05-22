@@ -47,6 +47,10 @@ class ProfileController extends GetxController {
     });
   }
 
+  onDispose(){
+    super.dispose();
+  }
+
   listenUserPost() async {
     totalPost += 1; //Increase total to prevent loadMore
     await _firebaseFirestore
@@ -110,15 +114,11 @@ class ProfileController extends GetxController {
       UI_Helper().setDialogMessage(onError, false);
     });
 
-    //Set postID deleted to database
-    // await FireBaseAuthentication.i.firebaseDatabase
-    //         .reference()
-    //         .child("userCountPost/${fireBaseAuthentication.getEmail(fireBaseAuthentication.email.value)}/idDel/idDel/")
-    //         .update({
-    //       "count": FireBaseAuthentication.i.globalPostCount.value - 1
-    //     }).catchError((onError) {
-    //       UI_Helper().setDialogMessage(onError, false);
-    //     });
+    //Delete image in Firebase
+    if (myPro.elementAt(index).type == 1) {
+      await FirebaseStorage.instance.ref(myPro.elementAt(index).imagePath).delete();
+    }
+
 
     //Decrease index global
     await FireBaseAuthentication.i.firebaseDatabase

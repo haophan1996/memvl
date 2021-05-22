@@ -9,7 +9,6 @@ import 'package:mem_vl/UI/Pages/Upload/upload_Controller.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class UploadUI extends GetView<UploadController> {
   @override

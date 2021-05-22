@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mem_vl/UI/Pages/Upload/upload_Binding.dart';
+import 'package:mem_vl/UI/Pages/Upload/upload_UI.dart';
 import 'package:mem_vl/Util/UI_Helper.dart';
+import 'package:mem_vl/Util/Date.dart';
 
 class ProfileUI extends GetView<ProfileController> {
   @override
@@ -31,18 +34,25 @@ class ProfileUI extends GetView<ProfileController> {
 
   getContentSubList(int index) {
     if (controller.myPro.elementAt(index).type == 1) {
-      return Container(
-        height: 250,
-        width: double.infinity,
-        decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            boxShadow: [BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)],
-            borderRadius: BorderRadius.all(Radius.circular(5)),
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(
-                  controller.myPro.elementAt(index).imageLink),
-              fit: BoxFit.contain,
-            )),
+      return Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 5),
+            child: controller.myPro.elementAt(index).status.length > 0
+                ? Text(controller.myPro.elementAt(index).status,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Color(0xFFF101113),
+                      height: 1.4,
+                      letterSpacing: 1.4,
+                    ))
+                : Container(),
+          ),
+          Image(
+            image: CachedNetworkImageProvider(
+                controller.myPro.elementAt(index).imageLink),
+          ),
+        ],
       );
     } else if (controller.myPro.elementAt(index).type == 0) {
       return Text(controller.myPro.elementAt(index).status,
@@ -55,30 +65,25 @@ class ProfileUI extends GetView<ProfileController> {
     } else if (controller.myPro.elementAt(index).type == 2) {
       return Column(
         children: <Widget>[
-          Container(
-            height: 250,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                boxShadow: [
-                  BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
-                ],
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                image: DecorationImage(
-                  // YoutubePlayer.convertUrlToId(controller.myPro.elementAt(index).Video)
-                  image: CachedNetworkImageProvider(
-                      "https://img.youtube.com/vi/${controller.myPro.elementAt(index).video}/0.jpg"),
-                  fit: BoxFit.contain,
-                )),
+          Padding(
+            padding: EdgeInsets.only(bottom: 5),
+            child: controller.myPro.elementAt(index).status.length > 0
+                ? Text(controller.myPro.elementAt(index).status,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Color(0xFFF101113),
+                      height: 1.4,
+                      letterSpacing: 1.4,
+                    ))
+                : Container(),
           ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                boxShadow: [
-                  BoxShadow(color: Color(0xffCED0D2), spreadRadius: 3)
-                ],
-                borderRadius: BorderRadius.all(Radius.circular(5))),
+          Image(
+            image: CachedNetworkImageProvider(
+              "https://img.youtube.com/vi/${controller.myPro.elementAt(index).video}/0.jpg",
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 5, right: 5, top: 5),
             child: Text(
               controller.myPro.elementAt(index).titleYoutube,
               style: TextStyle(
@@ -88,7 +93,7 @@ class ProfileUI extends GetView<ProfileController> {
                 letterSpacing: 1.4,
               ),
             ),
-          ),
+          )
         ],
       );
     }
@@ -103,42 +108,47 @@ class ProfileUI extends GetView<ProfileController> {
         color: Colors.black12,
       ),
       width: double.infinity,
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      //margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+      padding: EdgeInsets.only(top: 10),
       child: Column(
         children: <Widget>[
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Obx(
-                () => Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        image: controller
-                                    .fireBaseAuthentication.photoUrl.value ==
-                                null
-                            ? AssetImage("assets/signup_banner.png")
-                            : controller.fireBaseAuthentication.photoLink
-                                        .toString()
-                                        .length <
-                                    5
-                                ? Image.file(File(controller
-                                        .fireBaseAuthentication.photoUrl.value))
-                                    .image
-                                : CachedNetworkImageProvider(controller
-                                    .fireBaseAuthentication.photoLink),
-                        fit: BoxFit.cover,
-                      )),
+                () => Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: controller
+                                      .fireBaseAuthentication.photoUrl.value ==
+                                  null
+                              ? AssetImage("assets/signup_banner.png")
+                              : controller.fireBaseAuthentication.photoLink
+                                          .toString()
+                                          .length <
+                                      5
+                                  ? Image.file(File(controller
+                                          .fireBaseAuthentication
+                                          .photoUrl
+                                          .value))
+                                      .image
+                                  : CachedNetworkImageProvider(controller
+                                      .fireBaseAuthentication.photoLink),
+                          fit: BoxFit.cover,
+                        )),
+                  ),
                 ),
               ),
               SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(controller.myPro.elementAt(index).status,
+                  Text(controller.fireBaseAuthentication.name.value,
                       style: TextStyle(
                           color: Color(0xFFF101113),
                           fontSize: 19,
@@ -147,7 +157,8 @@ class ProfileUI extends GetView<ProfileController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(controller.myPro.elementAt(index).date.toString(),
+                      Text(
+                          readTimestamp(controller.myPro.elementAt(index).date),
                           style: TextStyle(
                               fontSize: 15, color: Color(0xFFF101113))),
                       SizedBox(width: 3),
@@ -166,7 +177,6 @@ class ProfileUI extends GetView<ProfileController> {
               ),
             ],
           ),
-          SizedBox(height: 10),
           getContentSubList(index),
         ],
       ),
@@ -269,7 +279,26 @@ class ProfileUI extends GetView<ProfileController> {
             ),
           ),
         ),
-        SizedBox(height: 10)
+        Padding(
+          padding: EdgeInsets.all(5),
+          child: SizedBox(
+            width: double.infinity,
+            child: TextButton(
+                child: Text("Create post".toUpperCase(),
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                style: ButtonStyle(
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.indigo),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                            side: BorderSide(color: Colors.grey)))),
+                onPressed: () {
+                  Get.to(() => UploadUI(), binding: UploadBinding());
+                }),
+          ),
+        )
       ],
     );
   }
