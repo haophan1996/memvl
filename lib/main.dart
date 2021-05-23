@@ -18,24 +18,25 @@ Future<void> main() async {
   /*
     Reload Firebase
    */
-   if (FirebaseAuth.instance.currentUser != null) {
-     DashBoardBing().dependencies();
-     await FirebaseAuth.instance.currentUser.reload().then((value) {
-       FireBaseAuthentication.i.setData();
-       FireBaseAuthentication.i.listenPostCountUser();
-     });
-   } else {
-     LoginBinding().dependencies();
-   }
+  if (FirebaseAuth.instance.currentUser != null) {
+    DashBoardBing().dependencies();
+    await FirebaseAuth.instance.currentUser.reload().then((value) {
+      FireBaseAuthentication.i.setData();
+      FireBaseAuthentication.i.listenPostCountUser();
+    });
+  } else {
+    LoginBinding().dependencies();
+  }
+
   runApp(GetApp());
 }
 
-class GetApp extends StatelessWidget{
+class GetApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: (FirebaseAuth.instance.currentUser == null) ? LoginUI() : DashBoardUI()
-    );
+        home: (FirebaseAuth.instance.currentUser == null)
+            ? LoginUI()
+            : DashBoardUI());
   }
-
 }

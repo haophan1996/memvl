@@ -26,7 +26,7 @@ class LoginController extends GetxController {
     super.onInit();
     prefs = await SharedPreferences.getInstance();
     isCheckBoxRemember.value =
-        (prefs.getBool("remember") ?? 0) ? prefs.getBool("remember") : false;
+        (prefs.getBool("remember") ?? false) ? prefs.getBool("remember") : false;
     if (isCheckBoxRemember.value == true) {
       await storage.read(key: "email").then((value) {
         if (value != null) controller_email.text = value;
@@ -64,12 +64,8 @@ class LoginController extends GetxController {
         await storage.write(key: "password", value: controller_pass.text);
       }
       fireBaseAuthentication.listenPostCountUser();
-      fireBaseAuthentication.userPostCount.stream.listen((event) {
-        if (event != null) {
-          Get.back();
-          signInUser();
-        }
-      });
+      Get.back();
+      signInUser();
     }, (msg) {
       //On fail
       UI_Helper().setDialogMessage(msg, false);

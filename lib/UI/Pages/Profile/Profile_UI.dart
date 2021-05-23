@@ -16,12 +16,13 @@ class ProfileUI extends GetView<ProfileController> {
       body: Obx(
         () => ListView.builder(
             controller: controller.scrollController,
+            cacheExtent: 999999999999,
             itemCount: controller.myPro.length + 1,
             itemBuilder: (BuildContext context, int index) {
               if (index == controller.myPro.length) {
-                return (controller.totalPost + 1) != (controller.myPro.length)
+                return Obx(() => controller.stopLoadMore.value == false
                     ? CupertinoActivityIndicator()
-                    : Container();
+                    : Container());
               }
               if (index == 0) {
                 return userProfile(context);
@@ -48,10 +49,12 @@ class ProfileUI extends GetView<ProfileController> {
                     ))
                 : Container(),
           ),
-          Image(
-            image: CachedNetworkImageProvider(
-                controller.myPro.elementAt(index).imageLink),
-          ),
+          CachedNetworkImage(
+            imageUrl: controller.myPro.elementAt(index).imageLink,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CupertinoActivityIndicator(),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          )
         ],
       );
     } else if (controller.myPro.elementAt(index).type == 0) {
@@ -103,13 +106,12 @@ class ProfileUI extends GetView<ProfileController> {
       BuildContext context, ProfileController controller, int index) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(6)),
         color: Colors.black12,
       ),
       width: double.infinity,
-      //margin: EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-      padding: EdgeInsets.only(top: 10),
+      margin: EdgeInsets.symmetric(vertical: 1, horizontal: 0),
+      padding: EdgeInsets.only(top: 1),
       child: Column(
         children: <Widget>[
           Row(
@@ -178,6 +180,21 @@ class ProfileUI extends GetView<ProfileController> {
             ],
           ),
           getContentSubList(index),
+          Row(
+            children: <Widget>[
+              Spacer(),
+              TextButton.icon(
+                  onPressed: () async {},
+                  icon: Icon(
+                    Icons.comment,
+                    color: Colors.black,
+                  ),
+                  label: Text(
+                    "Comment",
+                    style: TextStyle(color: Colors.black),
+                  ))
+            ],
+          )
         ],
       ),
     );

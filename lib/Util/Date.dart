@@ -7,7 +7,6 @@ String readTimestamp(int timestamp) {
   var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
   var diff = now.difference(date);
   var time = '';
-  print(diff.inDays);
 
   if (diff.inDays == 0){
     time = DateFormat.Hm().format(date);

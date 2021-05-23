@@ -12,78 +12,84 @@ class ProfileController extends GetxController {
   final FireBaseUploadImage fireBaseUploadImage = Get.find();
   final Map<String, int> myMap = {};
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   List<ProfileModel> myPro = List<ProfileModel>().obs;
-  var totalPost = 0;
   var scrollController = ScrollController();
   var imagePath = "".obs;
   var lastVisit;
-  var _limit;
-  bool stopUpdate = false;
+  final _limit = 5;
+  RxBool stopLoadMore = false.obs;
 
   @override
   Future<void> onInit() async {
     super.onInit();
-    totalPost = fireBaseAuthentication.userPostCount.value;
     myPro.add(null);
-    totalPost < 5 ? _limit = totalPost : _limit = 5;
-    if (totalPost > 0) await loadUserPost(_limit);
-
+    await loadUserPost(_limit);
     scrollController.addListener(() async {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
-        if ((myPro.length - 1) != totalPost) {
-          if (stopUpdate == false) {
-            totalPost - (myPro.length - 1) < 5
-                ? _limit = totalPost
-                : _limit = 5;
-            await loadMore(_limit);
-          }
-        }
+        await loadMore(_limit);
       }
     });
 
-    fireBaseAuthentication.userPostCount.stream.listen((event) {
-      if (fireBaseAuthentication.userSign == 0) listenUserPost();
+    fireBaseAuthentication.listPostUser.stream.listen((event) {
+      listenUserPost(event);
     });
   }
 
-  onDispose(){
+  onDispose() {
     super.dispose();
   }
 
-  listenUserPost() async {
-    totalPost += 1; //Increase total to prevent loadMore
-    await _firebaseFirestore
-        .collection("memeVl/Posts/collection/")
-        .where("UserID",
-            isEqualTo: FireBaseAuthentication.i.getEmail(
-                FireBaseAuthentication.i.firebaseAuth.currentUser.email))
-        .orderBy("Date", descending: true)
-        .limit(1)
-        .get()
-        .then((value) {
-      value.docs.forEach((element) async {
-        myPro.insert(1, myob(element));
+  listenUserPost(String postID) async {
+    if (myMap[fireBaseAuthentication.listPostUser.value] == null) {
+      await _firebaseFirestore
+          .collection("memeVl/Posts/collection/")
+          .doc(postID)
+          .get()
+          .then((element) {
+            if (element['UserID'] == fireBaseAuthentication.getEmail(fireBaseAuthentication.firebaseAuth.currentUser.email)){
+              myMap[fireBaseAuthentication.listPostUser.value] = 1;
+              myPro.insert(
+                  1,
+                  ProfileModel(
+                      element['Date'],
+                      element['Image'],
+                      element['ImageLink'],
+                      element['PostID'],
+                      element['Status'],
+                      element['TitleYoutube'],
+                      element['Type'],
+                      element['UserID'],
+                      element['Video']));
+            }
       });
-    });
+    }
   }
 
   loadMore(int limit) async {
-    await _firebaseFirestore
-        .collection("memeVl/Posts/collection/")
-        .where("UserID",
-            isEqualTo: FireBaseAuthentication.i.getEmail(
-                FireBaseAuthentication.i.firebaseAuth.currentUser.email))
-        .orderBy("Date", descending: true)
-        .startAfterDocument(lastVisit)
-        .limit(limit)
-        .get()
-        .then((value) async {
-      value.docs.forEach((element) async {
-        myPro.add(myob(element));
+    if (stopLoadMore.value == false) {
+      await _firebaseFirestore
+          .collection("memeVl/Posts/collection/")
+          .where("UserID",
+              isEqualTo: FireBaseAuthentication.i.getEmail(
+                  FireBaseAuthentication.i.firebaseAuth.currentUser.email))
+          .orderBy("Date", descending: true)
+          .startAfterDocument(lastVisit)
+          .limit(limit)
+          .get()
+          .then((value) async {
+        value.docs.forEach((element) async {
+          myPro.add(myob(element));
+        });
+        if (value.docs.length != 0)
+          lastVisit = value.docs[value.docs.length - 1];
+        else
+          stopLoadMore.value = true;
+      }).catchError((err) {
+        stopLoadMore.value = true;
       });
-      lastVisit = value.docs[value.docs.length - 1];
-    });
+    }
   }
 
   loadUserPost(int limit) async {
@@ -99,12 +105,16 @@ class ProfileController extends GetxController {
       value.docs.forEach((element) async {
         myPro.add(myob(element));
       });
-      lastVisit = value.docs[value.docs.length - 1];
+      if (value.docs.length - 1 == 0) {
+        stopLoadMore.value = true;
+      } else
+        lastVisit = value.docs[value.docs.length - 1];
+    }).catchError((err){
+      stopLoadMore.value = true;
     });
   }
 
   deleteDocument(int index) async {
-    stopUpdate = true;
     //Delete post in Firebase
     await _firebaseFirestore
         .collection("memeVl/Posts/collection/")
@@ -116,35 +126,15 @@ class ProfileController extends GetxController {
 
     //Delete image in Firebase
     if (myPro.elementAt(index).type == 1) {
-      await FirebaseStorage.instance.ref(myPro.elementAt(index).imagePath).delete();
+      await FirebaseStorage.instance
+          .ref(myPro.elementAt(index).imagePath)
+          .delete();
     }
-
-
-    //Decrease index global
-    await FireBaseAuthentication.i.firebaseDatabase
-        .reference()
-        .child("globalPostCount/")
-        .update({
-      "count": FireBaseAuthentication.i.globalPostCount.value - 1
-    }).catchError((onError) {
-      UI_Helper().setDialogMessage(onError, false);
-    });
-
-    //Decrease index user
-    await FireBaseAuthentication.i.firebaseDatabase
-        .reference()
-        .child(
-            "userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
-        .update({
-      "count": FireBaseAuthentication.i.userPostCount.value - 1
-    }).then((value) {
-      totalPost -= 1;
-      stopUpdate = false;
-      myPro.removeAt(index);
-      UI_Helper().setDialogMessage("Deleted", true);
-    }).catchError((onError) {
-      UI_Helper().setDialogMessage(onError, false);
-    });
+    myPro.removeAt(index);
+    print("her");
+    Get.back();
+    Get.back();
+    if (!stopLoadMore.value) await loadMore(_limit);
   }
 
   getUploadImage() async {
@@ -180,7 +170,7 @@ class ProfileController extends GetxController {
   }
 
   Object myob(QueryDocumentSnapshot<Map<String, dynamic>> element) {
-    myMap[element['PostID']] = myPro.length+1;
+    myMap[element['PostID']] = 1;
     return ProfileModel(
         element['Date'],
         element['Image'],

@@ -11,7 +11,6 @@ import 'package:mem_vl/Util/Youtube.dart';
 
 
 class UploadController extends GetxController {
-  //static UploadController get instance => Get.find<UploadController>();
   final FireBaseUploadImage fireBaseUploadImage = Get.find();
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   RxBool isValidInputYoutube = false.obs;
@@ -24,7 +23,6 @@ class UploadController extends GetxController {
   var idYoutube = "".obs;
   var currentIdPost = "";
   var timeStamps = "";
-
   var imagePathFirebase = "";
   var imageLinkFirebase = "";
 
@@ -70,41 +68,21 @@ class UploadController extends GetxController {
       "Video": idYoutube.value
     }).catchError((onError) {
       UI_Helper().setDialogMessage(onError, false);
-    });
-
-    //Add post id to owner
-    await _firebaseFirestore
-        .collection("memeVl/Users/${getEmail()}")
-        .doc()
-        .set({
-      "Date": int.parse(timeStamps),
-      "PostID": currentIdPost,
-    }).catchError((onError) {
-      UI_Helper().setDialogMessage(onError, false);
-    });
-
-    //Increment total index global
-    await FireBaseAuthentication.i.firebaseDatabase
-        .reference()
-        .child("globalPostCount/")
-        .update({
-      "count": FireBaseAuthentication.i.globalPostCount.value + 1
-    }).catchError((onError) {
-      UI_Helper().setDialogMessage(onError, false);
-    });
-
-    //Increment total index user
-    await FireBaseAuthentication.i.firebaseDatabase
-        .reference()
-        .child(
-            "userCountPost/${FireBaseAuthentication.i.getEmail(FireBaseAuthentication.i.firebaseAuth.currentUser.email)}/count")
-        .update({
-      "count": FireBaseAuthentication.i.userPostCount.value + 1
-    }).catchError((onError) {
-      UI_Helper().setDialogMessage(onError, false);
     }).then((value) {
-      UI_Helper().setDialogMessage("Success", true);
+      Get.back();
+      Get.back();
     });
+
+    // //Add post id to owner
+    // await _firebaseFirestore
+    //     .collection("memeVl/Users/${getEmail()}")
+    //     .doc()
+    //     .set({
+    //   "Date": int.parse(timeStamps),
+    //   "PostID": currentIdPost,
+    // }).catchError((onError) {
+    //   UI_Helper().setDialogMessage(onError, false);
+    // });
   }
 
   getImage() {

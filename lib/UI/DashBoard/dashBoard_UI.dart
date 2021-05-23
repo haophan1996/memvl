@@ -7,6 +7,7 @@ import 'package:mem_vl/UI/Login/login_binding.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_Controller.dart';
 import 'dashBoard_Controller.dart';
 
+// ignore: must_be_immutable
 class DashBoardUI extends GetView<DashBoardController> {
   @override
   Widget build(BuildContext context) {

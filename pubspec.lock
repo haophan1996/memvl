@@ -408,6 +408,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.1"
+  quick_actions:
+    dependency: "direct dev"
+    description:
+      name: quick_actions
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.0+1"
+  quick_actions_platform_interface:
+    dependency: transitive
+    description:
+      name: quick_actions_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   rxdart:
     dependency: transitive
     description:

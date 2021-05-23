@@ -13,12 +13,11 @@ class FireBaseAuthentication extends GetxController {
   RxString phone = "".obs;
   RxString email = "".obs;
   RxString photoUrl = "".obs;
-  RxInt userPostCount = 0.obs;
-  RxInt globalPostCount = 0.obs;
   var photoLink;
   User userCurrent;
   int userSign = 0; // 0 update, 1 delete
   int globalSign = 0; // 0 update, 1 delete
+  RxString listPostUser = "".obs;
 
   setData() {
     userCurrent = firebaseAuth.currentUser;
@@ -44,45 +43,16 @@ class FireBaseAuthentication extends GetxController {
 
 
   listenPostCountUser() {
+    // firebaseFirestore.collection("memeVl/Posts/collection").where("UserID", isEqualTo: getEmail(firebaseAuth.currentUser.email)).snapshots().listen((event) {
+    //       event.docChanges.forEach((element) {
+    //         listPostUser.value = element.doc['PostID'];
+    //       });
+    // });
     firebaseFirestore.collection("memeVl/Posts/collection").snapshots().listen((event) {
-          event.docChanges.forEach((element) {
-            print(element.doc['PostID']);
-          });
+      event.docChanges.forEach((element) {
+        listPostUser.value = element.doc['PostID'];
+      });
     });
-    
-    firebaseDatabase.reference().child(
-        "userCountPost/${getEmail(firebaseAuth.currentUser.email)}/count/count/")
-      ..onValue.listen((event) {
-        if (event.snapshot.value == null)
-          userPostCount.value = 0;
-        else {
-          if (event.snapshot.value >= userPostCount.value) {
-            userSign = 0;
-          } else
-            userSign = 1;
-          print("Post Count User: ${event.snapshot.value}");
-          print(userSign == 0 ? "update $userSign" : "delete $userSign");
-          print(event.snapshot.value);
-          print(userPostCount.value);
-          userPostCount.value = event.snapshot.value;
-        }
-      });
-
-    firebaseDatabase.reference().child("globalPostCount/count/")
-      ..onValue.listen((event) {
-        if (event.snapshot.value == null) globalPostCount.value = 0;
-        else {
-          if (event.snapshot.value >= globalPostCount.value) {
-            globalSign = 0;
-          } else
-            globalSign = 1;
-          print("Post Count Global: ${event.snapshot.value}");
-          print(globalSign == 0 ? "update $globalSign" : "delete $globalSign");
-          print(event.snapshot.value);
-          print(globalPostCount.value);
-          globalPostCount.value = event.snapshot.value;
-        }
-      });
   }
 
 

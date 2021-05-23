@@ -7,8 +7,10 @@ import 'package:mem_vl/UI/Pages/Profile/Profile_Binding.dart';
 import 'package:mem_vl/UI/Pages/Profile/Profile_UI.dart';
 
 class DashBoardController extends GetxController{
+  static DashBoardController get i => Get.find();
   final FireBaseAuthentication fireBaseAuthentication = Get.find();
   final selectedIndex = 0.obs;
+
 
   void onInit(){
     super.onInit();
